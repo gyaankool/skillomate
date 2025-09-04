@@ -1,3 +1,9 @@
+# Build dependencies (required for deployment)
+setuptools>=65.0.0
+wheel>=0.38.0
+pip>=22.0.0
+
+# Application dependencies
 Flask==2.3.3
 Flask-CORS==4.0.0
 openai>=1.0.0
