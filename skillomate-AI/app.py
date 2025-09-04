@@ -6,12 +6,7 @@ import json
 import base64
 import io
 import wave
-try:
-    import pyaudio
-    AUDIO_AVAILABLE = True
-except ImportError:
-    AUDIO_AVAILABLE = False
-    print("Warning: PyAudio not available. Audio functionality will be disabled.")
+import pyaudio
 import speech_recognition as sr
 from gtts import gTTS
 import tempfile
@@ -45,18 +40,11 @@ CORS(app, origins=['http://localhost:5173', 'http://localhost:3000', 'http://127
 # OpenAI Configuration
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-# Audio Configuration - Only set if pyaudio is available
-if AUDIO_AVAILABLE:
-    CHUNK = AUDIO_CHUNK
-    FORMAT = getattr(pyaudio, f'{AUDIO_FORMAT}')
-    CHANNELS = AUDIO_CHANNELS
-    RATE = AUDIO_RATE
-else:
-    # Set default values for when audio is not available
-    CHUNK = 1024
-    FORMAT = None
-    CHANNELS = 1
-    RATE = 44100
+# Audio Configuration
+CHUNK = AUDIO_CHUNK
+FORMAT = getattr(pyaudio, f'{AUDIO_FORMAT}')
+CHANNELS = AUDIO_CHANNELS
+RATE = AUDIO_RATE
 
 # Initialize the AI orchestrator
 ai_orchestrator = SkillomateAIOrchestrator()
@@ -200,16 +188,6 @@ Always maintain a helpful, encouraging tone and focus on educational value."""
             }
 
 # Initialize AI orchestrator (already done above)
-
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Health check endpoint for monitoring"""
-    return jsonify({
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "audio_available": AUDIO_AVAILABLE,
-        "version": "2.0"
-    })
 
 @app.route('/')
 def index():
@@ -556,13 +534,6 @@ def enhanced_chat():
 @app.route('/api/voice-input', methods=['POST'])
 def voice_input():
     """Handle voice input with context"""
-    if not AUDIO_AVAILABLE:
-        return jsonify({
-            "success": False,
-            "error": "Audio functionality not available on this platform",
-            "message": "Please use text input instead"
-        }), 503
-    
     try:
         # Check if audio file is present
         if 'audio' not in request.files:
@@ -751,13 +722,6 @@ def list_sessions():
 @app.route('/api/voice-output', methods=['POST'])
 def voice_output():
     """Convert text to speech"""
-    if not AUDIO_AVAILABLE:
-        return jsonify({
-            "success": False,
-            "error": "Audio functionality not available on this platform",
-            "message": "Please use text output instead"
-        }), 503
-    
     try:
         data = request.get_json()
         text = data.get('text', '')
