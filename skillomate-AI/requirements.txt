@@ -13,7 +13,7 @@ gTTS==2.3.2
 python-dotenv==1.0.0
 Werkzeug==3.0.0
 requests==2.31.0
-matplotlib==3.8.0
-seaborn==0.13.0
-numpy>=2.0.0
+matplotlib>=3.9.0
+seaborn>=0.13.0
+numpy>=1.26.0,<2.0.0
 Pillow>=10.1.0
