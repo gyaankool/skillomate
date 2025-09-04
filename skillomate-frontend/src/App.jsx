@@ -9,7 +9,7 @@ import Offline from './Offline';
 import Class from './pages/Class';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import HexagonalGrid from './pages/Hex';
+import HexagonalGrid from './pages/hex';
 
 const App = () => {
   return (
