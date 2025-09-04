@@ -2041,8 +2041,12 @@ import attach from "../assets/images/attach.png";
 import downArrow from "../assets/images/downArrow.png";
 import HexagonalGrid from "./Hex";
 import { useChat } from "../context/chatContext";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import config from "../../env-config.js";
+
+const API_BASE_URL = config.API_BASE_URL;
+const AI_SERVER_URL = config.AI_SERVER_URL;
 console.log('api base url', API_BASE_URL)
+console.log('ai server url', AI_SERVER_URL)
 
 const Dashboard = () => {
   const { chatSessions, currentChatId,setCurrentChatId, setChatSessions,chatHistory, setChatHistory, loadChat, deleteChat, createNewChat } = useChat()
@@ -2541,7 +2545,7 @@ const Dashboard = () => {
       console.log("Updating AI session context:", contextUpdates);
 
       const response = await fetch(
-        `http://localhost:8000/api/session/${aiSessionId}/context`,
+        `${AI_SERVER_URL}/api/session/${aiSessionId}/context`,
         {
           method: "PUT",
           headers: {
@@ -2672,7 +2676,7 @@ const Dashboard = () => {
     await addMessageToChat(newUserMessage);
 
     try {
-      const response = await fetch("http://localhost:8000/api/chat", {
+      const response = await fetch(`${AI_SERVER_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -3395,7 +3399,7 @@ const Dashboard = () => {
         subject: "Mathematics", // Default subject, can be enhanced
       };
 
-      const response = await fetch("http://localhost:8000/api/diagram", {
+      const response = await fetch(`${AI_SERVER_URL}/api/diagram`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

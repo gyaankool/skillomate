@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Send, BookOpen, Lightbulb, BarChart3, Download, Search, Settings } from 'lucide-react';
+import config from '../../env-config.js';
 
 const EnhancedHomeworkSolver = () => {
+  const AI_SERVER_URL = config.AI_SERVER_URL;
   const [question, setQuestion] = useState('');
   const [context, setContext] = useState({
     board: 'CBSE',
@@ -49,7 +51,7 @@ const EnhancedHomeworkSolver = () => {
 
   const fetchAvailableDiagrams = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/available-diagrams?subject=${context.subject}`);
+      const response = await fetch(`${AI_SERVER_URL}/api/available-diagrams?subject=${context.subject}`);
       const data = await response.json();
       if (data.success) {
         setAvailableDiagrams(data.available_diagrams);
@@ -61,7 +63,7 @@ const EnhancedHomeworkSolver = () => {
 
   const fetchCacheStats = async () => {
     try {
-              const response = await fetch('http://localhost:8000/api/cache/stats');
+              const response = await fetch(`${AI_SERVER_URL}/api/cache/stats`);
       const data = await response.json();
       if (data.success) {
         setCacheStats(data.stats);
@@ -93,7 +95,7 @@ const EnhancedHomeworkSolver = () => {
         endpoint = '/api/diagram';
       }
 
-              const response = await fetch(`http://localhost:8000${endpoint}`, {
+              const response = await fetch(`${AI_SERVER_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +126,7 @@ const EnhancedHomeworkSolver = () => {
     
     setLoading(true);
     try {
-              const response = await fetch('http://localhost:8000/api/guided-learning', {
+              const response = await fetch(`${AI_SERVER_URL}/api/guided-learning`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

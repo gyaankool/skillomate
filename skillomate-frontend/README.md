@@ -126,9 +126,9 @@ src/
 3. **Environment Setup**
    Create a `.env` file in the root directory:
    ```env
-   VITE_API_BASE_URL=http://localhost:7200/api/v1
-   VITE_SOCKET_URL=http://localhost:7200
-   VITE_AI_SERVER_URL=http://localhost:8000
+   VITE_API_BASE_URL=https://skillomate-backend.onrender.com/api
+VITE_SOCKET_URL=https://skillomate-backend.onrender.com
+VITE_AI_SERVER_URL=https://skillomate.onrender.com
    ```
 
 4. **Start the development server**
@@ -300,9 +300,9 @@ The application can be deployed to any static hosting service:
 ### Environment Configuration
 Ensure all environment variables are set in production:
 ```env
-VITE_API_BASE_URL=https://your-api-domain.com/api/v1
-VITE_SOCKET_URL=https://your-api-domain.com
-VITE_AI_SERVER_URL=https://your-ai-server.com
+VITE_API_BASE_URL=https://skillomate-backend.onrender.com/api
+VITE_SOCKET_URL=https://skillomate-backend.onrender.com
+VITE_AI_SERVER_URL=https://skillomate.onrender.com
 ```
 
 ## 🔒 Security Considerations

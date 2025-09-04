@@ -228,7 +228,9 @@ import download5 from "../assets/images/download5.jpeg";
 // import profile from "../assets/images/profile.png";
 import profile from "../assets/images/person.webp";
 import arrow from "../assets/images/arrow.png";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import config from '../../env-config.js';
+
+const API_BASE_URL = config.API_BASE_URL;
 console.log('api base url', API_BASE_URL)
 
 // Default avatars (assumed to be in public/assets/avatars)

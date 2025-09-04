@@ -7,21 +7,26 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    allowedHosts: [
+      'skillomate.onrender.com',
+      'skillomate-backend.onrender.com',
+      'skillomate-ai.onrender.com'
+    ],
     proxy: {
       '/api/auth': {
-        target: 'http://localhost:5000', // Backend auth server
+        target: 'https://skillomate-backend.onrender.com', // Backend auth server (deployed on Render)
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
       '/api/chat': {
-        target: 'http://localhost:5000', // Backend chat server
+        target: 'https://skillomate-backend.onrender.com', // Backend chat server (deployed on Render)
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
       '/api/ai': {
-        target: 'http://localhost:8000', // AI backend server
+        target: 'https://skillomate.onrender.com', // AI backend server (deployed on Render)
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
       '/socket.io/': {
         target: 'https://salesy.ai.anonimo.one',
