@@ -1,0 +1,215 @@
+{
+  "boards": {
+    "CBSE": {
+      "name": "Central Board of Secondary Education",
+      "style": "comprehensive, exam-focused, structured",
+      "subjects": ["Mathematics", "Science", "English", "Hindi", "Social Studies", "Computer Science", "Physics", "Chemistry", "Biology", "History", "Geography", "Economics", "Political Science"],
+      "description": "National board with standardized curriculum across India",
+      "exam_pattern": "Annual board exams with continuous evaluation",
+      "localization": {
+        "currency": "Indian Rupees (₹)",
+        "examples": "Indian festivals, cricket, local geography",
+        "measurements": "Metric system (km, kg, °C)",
+        "geography": "Indian rivers, mountains, states",
+        "history": "Indian independence, leaders, events",
+        "science": "ISRO, Indian scientists, local environment"
+      }
+    },
+    "ICSE": {
+      "name": "Indian Certificate of Secondary Education",
+      "style": "detailed, literature-focused, comprehensive",
+      "subjects": ["Mathematics", "Science", "English", "Hindi", "Social Studies", "Computer Science", "Physics", "Chemistry", "Biology", "History", "Geography", "Economics", "Literature"],
+      "description": "International curriculum with emphasis on English and literature",
+      "exam_pattern": "Comprehensive exams with internal assessment",
+      "localization": {
+        "currency": "Indian Rupees (₹)",
+        "examples": "Indian and international examples",
+        "measurements": "Metric system (km, kg, °C)",
+        "geography": "Global and Indian geography",
+        "history": "World and Indian history",
+        "science": "International and Indian scientific achievements"
+      }
+    },
+    "IB": {
+      "name": "International Baccalaureate",
+      "style": "inquiry-based, global perspective, analytical",
+      "subjects": ["Mathematics", "Sciences", "Language", "Individuals and Societies", "Arts", "Design"],
+      "description": "International curriculum promoting critical thinking and global awareness",
+      "exam_pattern": "Internal and external assessment with extended essay",
+      "localization": {
+        "currency": "Multiple currencies including Indian Rupees",
+        "examples": "Global examples with Indian context",
+        "measurements": "Metric system with international standards",
+        "geography": "Global geography with Indian case studies",
+        "history": "World history with Indian perspective",
+        "science": "Global scientific developments with Indian contributions"
+      }
+    },
+    "State": {
+      "name": "State Board",
+      "style": "local context, regional focus, practical",
+      "subjects": ["Mathematics", "Science", "English", "Regional Language", "Social Studies", "Computer Science", "Physics", "Chemistry", "Biology", "History", "Geography", "Economics"],
+      "description": "State-specific curriculum with regional language and local context",
+      "exam_pattern": "State board exams with practical components",
+      "localization": {
+        "currency": "Indian Rupees (₹)",
+        "examples": "Regional festivals, local sports, state geography",
+        "measurements": "Metric system (km, kg, °C)",
+        "geography": "State geography, local rivers, regional features",
+        "history": "State history, local leaders, regional events",
+        "science": "Local environmental issues, regional scientific institutions"
+      }
+    }
+  },
+  "grade_levels": {
+    "primary": {
+      "grades": ["1", "2", "3", "4", "5"],
+      "style": "simple, visual, story-based, interactive",
+      "age_range": "6-11 years",
+      "characteristics": {
+        "language": "Simple vocabulary, short sentences, basic concepts",
+        "explanation_depth": "Very detailed, step-by-step, visual aids",
+        "examples": "Everyday objects, familiar situations, stories",
+        "formatting": "Large text, colorful, lots of pictures",
+        "interaction": "Games, activities, hands-on learning"
+      },
+      "subjects_focus": {
+        "mathematics": "Basic numbers, simple operations, shapes",
+        "science": "Simple experiments, basic concepts, nature",
+        "language": "Basic reading, writing, grammar",
+        "social_studies": "Family, community, basic geography"
+      }
+    },
+    "middle": {
+      "grades": ["6", "7", "8"],
+      "style": "conceptual, examples, step-by-step, building foundation",
+      "age_range": "11-14 years",
+      "characteristics": {
+        "language": "Clear explanations, moderate vocabulary, structured",
+        "explanation_depth": "Detailed with examples, clear steps",
+        "examples": "Relevant examples, real-world applications",
+        "formatting": "Structured, bullet points, clear headings",
+        "interaction": "Problem-solving, critical thinking, discussions"
+      },
+      "subjects_focus": {
+        "mathematics": "Algebra, geometry, problem-solving",
+        "science": "Scientific method, experiments, concepts",
+        "language": "Literature, grammar, composition",
+        "social_studies": "History, geography, civics"
+      }
+    },
+    "secondary": {
+      "grades": ["9", "10"],
+      "style": "detailed, exam-ready, comprehensive, analytical",
+      "age_range": "14-16 years",
+      "characteristics": {
+        "language": "Standard academic vocabulary, subject-specific terms",
+        "explanation_depth": "Comprehensive, exam-ready format",
+        "examples": "Specific examples, case studies, applications",
+        "formatting": "Professional, structured, exam-style",
+        "interaction": "Analysis, evaluation, synthesis"
+      },
+      "subjects_focus": {
+        "mathematics": "Advanced algebra, trigonometry, calculus basics",
+        "science": "Physics, chemistry, biology specialization",
+        "language": "Advanced literature, critical analysis",
+        "social_studies": "Detailed history, geography, economics"
+      }
+    },
+    "higher_secondary": {
+      "grades": ["11", "12"],
+      "style": "advanced, analytical, research-oriented, specialized",
+      "age_range": "16-18 years",
+      "characteristics": {
+        "language": "Advanced technical vocabulary, precise terminology",
+        "explanation_depth": "Concise, analytical, research-oriented",
+        "examples": "Complex examples, research studies, advanced applications",
+        "formatting": "Academic, research-style, professional",
+        "interaction": "Research, analysis, independent study"
+      },
+      "subjects_focus": {
+        "mathematics": "Calculus, statistics, advanced mathematics",
+        "science": "Specialized physics, chemistry, biology",
+        "language": "Advanced literature, linguistics, composition",
+        "social_studies": "Advanced history, political science, economics"
+      }
+    }
+  },
+  "subjects": {
+    "mathematics": {
+      "topics": {
+        "primary": ["Numbers", "Basic Operations", "Shapes", "Measurement", "Money"],
+        "middle": ["Algebra", "Geometry", "Fractions", "Decimals", "Percentages"],
+        "secondary": ["Trigonometry", "Statistics", "Probability", "Coordinate Geometry"],
+        "higher_secondary": ["Calculus", "Vectors", "Linear Programming", "Complex Numbers"]
+      },
+      "localization": {
+        "currency": "Indian Rupees (₹)",
+        "examples": "Indian currency, local measurements, regional problems",
+        "context": "Indian market prices, local distances, regional statistics"
+      }
+    },
+    "science": {
+      "topics": {
+        "primary": ["Living World", "Materials", "Energy", "Environment"],
+        "middle": ["Physics", "Chemistry", "Biology", "Scientific Method"],
+        "secondary": ["Mechanics", "Organic Chemistry", "Genetics", "Ecology"],
+        "higher_secondary": ["Advanced Physics", "Physical Chemistry", "Molecular Biology"]
+      },
+      "localization": {
+        "examples": "ISRO achievements, Indian scientists, local environmental issues",
+        "context": "Indian climate, local ecosystems, regional scientific institutions"
+      }
+    },
+    "social_studies": {
+      "topics": {
+        "primary": ["Family", "Community", "Basic Geography", "Simple History"],
+        "middle": ["Indian History", "Geography", "Civics", "Economics Basics"],
+        "secondary": ["Modern History", "World Geography", "Political Science", "Economics"],
+        "higher_secondary": ["Advanced History", "International Relations", "Economic Theory"]
+      },
+      "localization": {
+        "examples": "Indian independence movement, local leaders, regional history",
+        "context": "Indian democracy, local governance, regional development"
+      }
+    },
+    "english": {
+      "topics": {
+        "primary": ["Basic Reading", "Writing", "Grammar", "Vocabulary"],
+        "middle": ["Literature", "Composition", "Grammar", "Comprehension"],
+        "secondary": ["Advanced Literature", "Creative Writing", "Grammar", "Analysis"],
+        "higher_secondary": ["Advanced Literature", "Linguistics", "Creative Writing", "Critical Analysis"]
+      },
+      "localization": {
+        "examples": "Indian authors, local stories, regional literature",
+        "context": "Indian English, local expressions, cultural context"
+      }
+    }
+  },
+  "assessment_patterns": {
+    "CBSE": {
+      "primary": "Continuous evaluation with project work",
+      "middle": "Periodic tests with project work",
+      "secondary": "Board exams with internal assessment",
+      "higher_secondary": "Board exams with practical assessment"
+    },
+    "ICSE": {
+      "primary": "Continuous evaluation with activities",
+      "middle": "Internal assessment with projects",
+      "secondary": "Board exams with internal assessment",
+      "higher_secondary": "Board exams with coursework"
+    },
+    "IB": {
+      "primary": "Continuous assessment with portfolios",
+      "middle": "Internal and external assessment",
+      "secondary": "Internal and external assessment with extended essay",
+      "higher_secondary": "Internal and external assessment with extended essay"
+    },
+    "State": {
+      "primary": "Continuous evaluation with practical work",
+      "middle": "Periodic tests with practical components",
+      "secondary": "State board exams with practical assessment",
+      "higher_secondary": "State board exams with specialized assessment"
+    }
+  }
+}

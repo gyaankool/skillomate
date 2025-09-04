@@ -1,0 +1,266 @@
+{
+  "total_tests": 15,
+  "passed_tests": 13,
+  "failed_tests": 2,
+  "test_details": [
+    {
+      "name": "Health Check",
+      "category": "system_health",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.019,
+      "details": {
+        "response_keys": [
+          "ai_orchestrator",
+          "openai_key",
+          "status",
+          "timestamp"
+        ],
+        "response_size": 126
+      }
+    },
+    {
+      "name": "Create Session",
+      "category": "session_management",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.01,
+      "details": {
+        "response_keys": [
+          "message",
+          "session_id",
+          "success"
+        ],
+        "response_size": 114
+      }
+    },
+    {
+      "name": "Greeting Test",
+      "category": "conversational_flow",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 3.567,
+      "details": {
+        "response_keys": [
+          "answer",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "timestamp"
+        ],
+        "response_size": 798
+      }
+    },
+    {
+      "name": "Identity Question",
+      "category": "conversational_flow",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 5.404,
+      "details": {
+        "response_keys": [
+          "answer",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "timestamp"
+        ],
+        "response_size": 712
+      }
+    },
+    {
+      "name": "CBSE Math Problem",
+      "category": "homework_solving",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 5.527,
+      "details": {
+        "response_keys": [
+          "answer",
+          "context",
+          "conversation_summary",
+          "interactive",
+          "is_followup",
+          "metadata",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "suggestions"
+        ],
+        "response_size": 2019
+      }
+    },
+    {
+      "name": "ICSE Math Problem",
+      "category": "homework_solving",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 7.018,
+      "details": {
+        "response_keys": [
+          "answer",
+          "context",
+          "conversation_summary",
+          "interactive",
+          "is_followup",
+          "metadata",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "suggestions"
+        ],
+        "response_size": 3163
+      }
+    },
+    {
+      "name": "Progressive Hints",
+      "category": "guided_learning",
+      "status": "FAILED",
+      "error": "Value 'What do you know about' not found in field 'answer'",
+      "response_time": 7.38,
+      "details": {}
+    },
+    {
+      "name": "Science with Indian Examples",
+      "category": "indian_context",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 3.668,
+      "details": {
+        "response_keys": [
+          "answer",
+          "context",
+          "conversation_summary",
+          "interactive",
+          "is_followup",
+          "metadata",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "suggestions"
+        ],
+        "response_size": 1161
+      }
+    },
+    {
+      "name": "Triangle Diagram",
+      "category": "diagram_generation",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.47,
+      "details": {
+        "response_keys": [
+          "answer",
+          "complexity",
+          "description",
+          "diagram_type",
+          "image_data",
+          "labels",
+          "metadata",
+          "response",
+          "subject",
+          "success"
+        ],
+        "response_size": 45285
+      }
+    },
+    {
+      "name": "Indian Math Problem Test",
+      "category": "enhanced_features",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 11.734,
+      "details": {
+        "response_keys": [
+          "answer",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "timestamp"
+        ],
+        "response_size": 2216
+      }
+    },
+    {
+      "name": "Question Bank Generation",
+      "category": "offline_features",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.016,
+      "details": {
+        "response_keys": [
+          "question_bank",
+          "success"
+        ],
+        "response_size": 624
+      }
+    },
+    {
+      "name": "Cache Statistics",
+      "category": "cache_operations",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.01,
+      "details": {
+        "response_keys": [
+          "stats",
+          "success"
+        ],
+        "response_size": 754
+      }
+    },
+    {
+      "name": "Get Session Info",
+      "category": "session_management",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.006,
+      "details": {
+        "response_keys": [
+          "conversation_history",
+          "created_at",
+          "last_activity",
+          "session_id",
+          "success",
+          "user_context"
+        ],
+        "response_size": 2560
+      }
+    },
+    {
+      "name": "Follow-up Question",
+      "category": "conversation_continuity",
+      "status": "FAILED",
+      "error": "Value '40 cm' not found in field 'response'",
+      "response_time": 7.035,
+      "details": {}
+    },
+    {
+      "name": "Response Time Test",
+      "category": "performance",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 7.736,
+      "details": {
+        "response_keys": [
+          "answer",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "timestamp"
+        ],
+        "response_size": 972
+      }
+    }
+  ],
+  "performance_metrics": {},
+  "timestamp": "2025-08-26T18:06:24.727508",
+  "total_execution_time": 67.2
+}

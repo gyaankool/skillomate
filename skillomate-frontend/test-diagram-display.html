@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagram Display Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .diagram-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .diagram-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .diagram-image {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        .diagram-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .error {
+            color: red;
+            background: #ffe6e6;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            background: #e6ffe6;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Diagram Display Test</h1>
+        <p>This page tests the diagram generation and display functionality.</p>
+        
+        <div>
+            <button class="test-button" onclick="testTriangle()">Test Triangle Diagram</button>
+            <button class="test-button" onclick="testCircle()">Test Circle Diagram</button>
+            <button class="test-button" onclick="testCircuit()">Test Electric Circuit</button>
+            <button class="test-button" onclick="testClimateGraph()">Test Climate Graph</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <div class="formatted-content">
+        <h2>Understanding History: Important Events in India</h2>
+        
+        <h3>1. Introduction</h3>
+        <p>History is like a storybook of our past. It helps us understand how people lived, what they did, and how our country became what it is today. Each day has its own special events that are remembered.</p>
+        
+        <h3>2. Main Points</h3>
+        <p>Let's look at some historical events that happened on today's date, as well as why they are important.</p>
+        
+        <h4>1. Birth of Famous Leaders</h4>
+        <ul>
+            <li>On this day, some great leaders were born.</li>
+            <li><strong>Example:</strong> Imagine if today was the birthday of Dr. B.R. Ambedkar, who helped write our Constitution. He believed in equality and worked for the rights of all people.</li>
+        </ul>
+        
+        <h4>2. Important Movements</h4>
+        <ul>
+            <li>Sometimes on this day, important movements for freedom or social change took place.</li>
+            <li><strong>Example:</strong> Think about the Salt March led by Mahatma Gandhi. This was a peaceful protest against British laws that showed how people can come together for a good reason.</li>
+        </ul>
+        
+        <h4>3. Cultural Events</h4>
+        <ul>
+            <li>History also includes festivals and celebrations.</li>
+            <li><strong>Example:</strong> If today were Diwali, we would remember how people celebrate the victory of light over darkness, just like our ancestors celebrated their wins.</li>
+        </ul>
+        
+        <h3>3. Explanation</h3>
+        <ul>
+            <li><strong>Birth of Famous Leaders:</strong> Great leaders inspire us. They worked hard to make our country better. Celebrating their birthdays helps us remember their contributions.</li>
+            <li><strong>Important Movements:</strong> Movements are crucial in history as they represent the fight for rights and justice. They teach us the importance of standing together for a good cause.</li>
+            <li><strong>Cultural Events:</strong> Festivals connect us to our culture and traditions. They remind us of our shared history and values.</li>
+        </ul>
+        
+        <h3>4. Summary</h3>
+        <ul>
+            <li><strong>Learning from the Past:</strong> By studying what happened on this day in history, we learn valuable lessons about unity and peace.</li>
+            <li><strong>Celebrating Our Culture:</strong> Understanding historical events helps us appreciate our rich culture and heritage.</li>
+        </ul>
+        
+        <p><strong>Final Note:</strong> History is all around us, connecting us to our past. Each event teaches us something valuable. Remember, every day can teach us something new about our country and the wonderful people who have shaped it!</p>
+        
+        <p><em>Diagram Suggestion:</em> Include a timeline diagram to visually represent the important events mentioned (birth of leaders, movements, cultural events).</p>
+    </div>
+
+    <style>
+        .formatted-content {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .formatted-content h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .formatted-content h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .formatted-content h4 {
+            color: #7f8c8d;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .formatted-content p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .formatted-content ul {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+        
+        .formatted-content li {
+            margin-bottom: 8px;
+        }
+        
+        .formatted-content strong {
+            color: #e74c3c;
+        }
+        
+        .formatted-content em {
+            color: #27ae60;
+            font-style: italic;
+        }
+    </style>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        async function testDiagram(question, context) {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                resultsDiv.innerHTML = '<div class="success">🔄 Generating diagram...</div>';
+                
+                const response = await fetch(`${API_BASE}/api/diagram`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        context: context
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.image_data) {
+                    const diagramHtml = `
+                        <div class="diagram-container">
+                            <div class="diagram-title">📊 ${data.description || 'Generated Diagram'}</div>
+                            <img src="data:image/png;base64,${data.image_data}" 
+                                 alt="${data.description || 'Generated Diagram'}" 
+                                 class="diagram-image"
+                                 onerror="this.parentElement.innerHTML='<div class=error>❌ Failed to load diagram image</div>'">
+                            <div class="diagram-info">
+                                <strong>Type:</strong> ${data.diagram_type || 'Unknown'} | 
+                                <strong>Complexity:</strong> ${data.complexity || 'Moderate'} |
+                                <strong>Subject:</strong> ${data.subject || 'Unknown'}
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML = diagramHtml;
+                } else {
+                    resultsDiv.innerHTML = `<div class="error">❌ Failed to generate diagram: ${data.error || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function testTriangle() {
+            testDiagram(
+                "Draw a triangle with base 6cm and height 4cm",
+                { board: "CBSE", grade: "8", subject: "Mathematics" }
+            );
+        }
+        
+        function testCircle() {
+            testDiagram(
+                "Draw a circle with radius 3cm",
+                { board: "CBSE", grade: "7", subject: "Mathematics" }
+            );
+        }
+        
+        function testCircuit() {
+            testDiagram(
+                "Draw an electric circuit with battery, resistor, and bulb",
+                { board: "CBSE", grade: "7", subject: "Science" }
+            );
+        }
+        
+        function testClimateGraph() {
+            testDiagram(
+                "Create a climate graph showing temperature and rainfall",
+                { board: "CBSE", grade: "9", subject: "Geography" }
+            );
+        }
+    </script>
+</body>
+</html>

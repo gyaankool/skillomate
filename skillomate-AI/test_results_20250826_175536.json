@@ -1,0 +1,256 @@
+{
+  "total_tests": 15,
+  "passed_tests": 12,
+  "failed_tests": 3,
+  "test_details": [
+    {
+      "name": "Health Check",
+      "category": "system_health",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.026,
+      "details": {
+        "response_keys": [
+          "ai_orchestrator",
+          "openai_key",
+          "status",
+          "timestamp"
+        ],
+        "response_size": 126
+      }
+    },
+    {
+      "name": "Create Session",
+      "category": "session_management",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.005,
+      "details": {
+        "response_keys": [
+          "message",
+          "session_id",
+          "success"
+        ],
+        "response_size": 114
+      }
+    },
+    {
+      "name": "Greeting Test",
+      "category": "conversational_flow",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 4.147,
+      "details": {
+        "response_keys": [
+          "answer",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "timestamp"
+        ],
+        "response_size": 784
+      }
+    },
+    {
+      "name": "Identity Question",
+      "category": "conversational_flow",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 5.33,
+      "details": {
+        "response_keys": [
+          "answer",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "timestamp"
+        ],
+        "response_size": 712
+      }
+    },
+    {
+      "name": "CBSE Math Problem",
+      "category": "homework_solving",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 6.352,
+      "details": {
+        "response_keys": [
+          "answer",
+          "context",
+          "conversation_summary",
+          "interactive",
+          "is_followup",
+          "metadata",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "suggestions"
+        ],
+        "response_size": 2109
+      }
+    },
+    {
+      "name": "ICSE Math Problem",
+      "category": "homework_solving",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 7.654,
+      "details": {
+        "response_keys": [
+          "answer",
+          "context",
+          "conversation_summary",
+          "interactive",
+          "is_followup",
+          "metadata",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "suggestions"
+        ],
+        "response_size": 3191
+      }
+    },
+    {
+      "name": "Progressive Hints",
+      "category": "guided_learning",
+      "status": "FAILED",
+      "error": "Value 'What do you know about' not found in field 'answer'",
+      "response_time": 6.698,
+      "details": {}
+    },
+    {
+      "name": "Science with Indian Examples",
+      "category": "indian_context",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 4.56,
+      "details": {
+        "response_keys": [
+          "answer",
+          "context",
+          "conversation_summary",
+          "interactive",
+          "is_followup",
+          "metadata",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "suggestions"
+        ],
+        "response_size": 1247
+      }
+    },
+    {
+      "name": "Triangle Diagram",
+      "category": "diagram_generation",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.383,
+      "details": {
+        "response_keys": [
+          "answer",
+          "complexity",
+          "description",
+          "diagram_type",
+          "image_data",
+          "labels",
+          "metadata",
+          "response",
+          "subject",
+          "success"
+        ],
+        "response_size": 45285
+      }
+    },
+    {
+      "name": "Indian Math Problem Test",
+      "category": "enhanced_features",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)",
+      "response_time": 0,
+      "details": {}
+    },
+    {
+      "name": "Question Bank Generation",
+      "category": "offline_features",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.027,
+      "details": {
+        "response_keys": [
+          "question_bank",
+          "success"
+        ],
+        "response_size": 624
+      }
+    },
+    {
+      "name": "Cache Statistics",
+      "category": "cache_operations",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.01,
+      "details": {
+        "response_keys": [
+          "stats",
+          "success"
+        ],
+        "response_size": 754
+      }
+    },
+    {
+      "name": "Get Session Info",
+      "category": "session_management",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 0.005,
+      "details": {
+        "response_keys": [
+          "conversation_history",
+          "created_at",
+          "last_activity",
+          "session_id",
+          "success",
+          "user_context"
+        ],
+        "response_size": 1266
+      }
+    },
+    {
+      "name": "Follow-up Question",
+      "category": "conversation_continuity",
+      "status": "FAILED",
+      "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=10)",
+      "response_time": 0,
+      "details": {}
+    },
+    {
+      "name": "Response Time Test",
+      "category": "performance",
+      "status": "PASSED",
+      "error": null,
+      "response_time": 8.531,
+      "details": {
+        "response_keys": [
+          "answer",
+          "response",
+          "session_id",
+          "source",
+          "success",
+          "timestamp"
+        ],
+        "response_size": 950
+      }
+    }
+  ],
+  "performance_metrics": {},
+  "timestamp": "2025-08-26T17:54:25.001368",
+  "total_execution_time": 71.33
+}
