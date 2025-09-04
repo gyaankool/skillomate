@@ -3,13 +3,9 @@ from flask_cors import CORS
 import openai
 import os
 import json
-import base64
-import io
-import wave
-import pyaudio
-import speech_recognition as sr
-from gtts import gTTS
-import tempfile
+
+
+
 import logging
 from datetime import datetime
 import uuid
@@ -39,12 +35,6 @@ CORS(app, origins=['http://localhost:5173', 'http://localhost:3000', 'http://127
 
 # OpenAI Configuration
 openai.api_key = os.getenv('OPENAI_API_KEY')
-
-# Audio Configuration
-CHUNK = AUDIO_CHUNK
-FORMAT = getattr(pyaudio, f'{AUDIO_FORMAT}')
-CHANNELS = AUDIO_CHANNELS
-RATE = AUDIO_RATE
 
 # Initialize the AI orchestrator
 ai_orchestrator = SkillomateAIOrchestrator()
@@ -119,73 +109,7 @@ Always maintain a helpful, encouraging tone and focus on educational value."""
                 "details": str(e)
             }
 
-    def process_voice_input(self, audio_data):
-        """Process voice input and convert to text"""
-        try:
-            # Create recognizer
-            recognizer = sr.Recognizer()
-            
-            # Convert audio data to AudioData object
-            audio = sr.AudioData(audio_data, RATE, 2)
-            
-            # Recognize speech
-            text = recognizer.recognize_google(audio)
-            
-            return {
-                "success": True,
-                "text": text
-            }
-            
-        except sr.UnknownValueError:
-            return {
-                "success": False,
-                "error": "Could not understand audio"
-            }
-        except sr.RequestError as e:
-            return {
-                "success": False,
-                "error": f"Could not request results: {str(e)}"
-            }
-        except Exception as e:
-            logger.error(f"Error processing voice input: {str(e)}")
-            return {
-                "success": False,
-                "error": "Failed to process voice input"
-            }
 
-    def text_to_speech(self, text):
-        """Convert text to speech"""
-        try:
-            # Create gTTS object
-            tts = gTTS(text=text, lang='en', slow=False)
-            
-            # Save to temporary file
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as fp:
-                tts.save(fp.name)
-                temp_file_path = fp.name
-            
-            # Read the file and convert to base64
-            with open(temp_file_path, 'rb') as f:
-                audio_data = f.read()
-            
-            # Clean up temporary file
-            os.unlink(temp_file_path)
-            
-            # Convert to base64
-            audio_base64 = base64.b64encode(audio_data).decode('utf-8')
-            
-            return {
-                "success": True,
-                "audio": audio_base64,
-                "format": "mp3"
-            }
-            
-        except Exception as e:
-            logger.error(f"Error in text-to-speech: {str(e)}")
-            return {
-                "success": False,
-                "error": "Failed to convert text to speech"
-            }
 
 # Initialize AI orchestrator (already done above)
 
@@ -209,8 +133,6 @@ def index():
             "guided_learning": "/api/guided-learning",
             "diagram": "/api/diagram",
             "chat": "/api/chat",
-            "voice_input": "/api/voice-input",
-            "voice_output": "/api/voice-output",
             "cache_stats": "/api/cache/stats",
             "search_cache": "/api/cache/search",
             "health": "/api/health",
@@ -531,55 +453,7 @@ def enhanced_chat():
         logger.error(f"Error in enhanced chat endpoint: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/voice-input', methods=['POST'])
-def voice_input():
-    """Handle voice input with context"""
-    try:
-        # Check if audio file is present
-        if 'audio' not in request.files:
-            return jsonify({
-                "success": False,
-                "error": "Audio file is required"
-            }), 400
-        
-        audio_file = request.files['audio']
-        
-        # Get context and session_id from form data
-        context = request.form.get('context', '{}')
-        session_id = request.form.get('session_id', None)
-        
-        try:
-            context_data = json.loads(context) if context else {}
-        except json.JSONDecodeError:
-            context_data = {}
-        
-        # Read audio data
-        audio_data = audio_file.read()
-        
-        # Process voice input using the new AI orchestrator
-        # For now, we'll use a simple text-to-speech approach
-        # TODO: Implement voice processing with the new orchestrator
-        result = {
-            'success': True,
-            'text': 'Voice input processing not yet implemented with new orchestrator',
-            'message': 'Please use text input for now'
-        }
-        
-        # If we have session_id and context, update the session
-        if session_id and context_data:
-            ai_orchestrator._update_session_context(session_id, context_data)
-        
-        # Ensure consistent response format
-        if result.get('success') and 'answer' in result:
-            result['response'] = result['answer']  # Map answer to response for compatibility
-        return jsonify(result)
-        
-    except Exception as e:
-        logger.error(f"Error in voice input endpoint: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": "Internal server error"
-        }), 500
+
 
 @app.route('/api/session/create', methods=['POST'])
 def create_session():
@@ -719,38 +593,7 @@ def list_sessions():
             "error": "Failed to list sessions"
         }), 500
 
-@app.route('/api/voice-output', methods=['POST'])
-def voice_output():
-    """Convert text to speech"""
-    try:
-        data = request.get_json()
-        text = data.get('text', '')
-        
-        if not text:
-            return jsonify({
-                "success": False,
-                "error": "Text is required"
-            }), 400
-        
-        # Convert text to speech
-        # TODO: Implement text-to-speech with the new orchestrator
-        result = {
-            'success': True,
-            'audio_url': 'Text-to-speech not yet implemented with new orchestrator',
-            'message': 'Please use text output for now'
-        }
-        
-        # Ensure consistent response format
-        if result.get('success') and 'answer' in result:
-            result['response'] = result['answer']  # Map answer to response for compatibility
-        return jsonify(result)
-        
-    except Exception as e:
-        logger.error(f"Error in voice output endpoint: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": "Internal server error"
-        }), 500
+
 
 # Offline Question Bank Endpoints
 @app.route('/api/offline/sync-status/<grade>/<subject>/<board>', methods=['GET'])

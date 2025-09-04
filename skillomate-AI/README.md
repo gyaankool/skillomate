@@ -265,11 +265,7 @@ Get available diagram types for a subject.
 /api/available-diagrams?subject=Mathematics
 ```
 
-#### `/api/voice-input` (POST)
-Convert voice to text (legacy support).
 
-#### `/api/voice-output` (POST)
-Convert text to speech (legacy support).
 
 ## 🎯 Usage Examples
 
@@ -463,7 +459,6 @@ For support and questions:
 
 ### v1.0
 - Basic AI chat functionality
-- Voice input/output
 - Simple chart generation
 
 ---

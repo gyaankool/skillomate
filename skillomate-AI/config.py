@@ -19,12 +19,6 @@ CACHE_DB_PATH = os.path.join(CACHE_DIR, 'skillomate_cache.db')
 CACHE_JSON_PATH = os.path.join(CACHE_DIR, 'qa_cache.json')
 CACHE_RETENTION_DAYS = int(os.getenv('CACHE_RETENTION_DAYS', 30))
 
-# Audio Configuration
-AUDIO_CHUNK = 1024
-AUDIO_FORMAT = 'paInt16'
-AUDIO_CHANNELS = 1
-AUDIO_RATE = 44100
-
 # API Configuration
 API_RATE_LIMIT = int(os.getenv('API_RATE_LIMIT', 100))
 API_RATE_WINDOW = int(os.getenv('API_RATE_WINDOW', 900))  # 15 minutes
