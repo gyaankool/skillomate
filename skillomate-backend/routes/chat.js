@@ -112,6 +112,37 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// @desc    Get messages for a specific chat session
+// @route   GET /api/chat/:id/messages
+// @access  Private
+router.get('/:id/messages', async (req, res) => {
+  try {
+    console.log('GET /api/chat/:id/messages - Chat ID:', req.params.id, 'User ID:', req.user.id);
+    const chat = await Chat.getChatWithMessages(req.params.id, req.user.id);
+    
+    if (!chat) {
+      console.log('Chat not found');
+      return res.status(404).json({
+        success: false,
+        error: 'Chat session not found'
+      });
+    }
+    
+    console.log('Chat messages found:', chat.messages ? chat.messages.length : 0);
+    
+    res.json({
+      success: true,
+      data: chat.messages || []
+    });
+  } catch (error) {
+    console.error('Error fetching chat messages:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch chat messages'
+    });
+  }
+});
+
 // @desc    Create a new chat session
 // @route   POST /api/chat
 // @access  Private
@@ -296,10 +327,10 @@ router.post('/ai-session', async (req, res) => {
     // Call AI backend to create session with user context
     try {
       console.log('Attempting to connect to AI backend...');
-      console.log('AI Backend URL:', `${process.env.AI_BACKEND_URL || 'http://localhost:8000'}/api/session/create`);
+      console.log('AI Backend URL:', `${process.env.AI_BACKEND_URL || 'https://skillomate.onrender.com'}/api/session/create`);
       console.log('User context being sent:', userContext);
       
-      const aiResponse = await axios.post(`${process.env.AI_BACKEND_URL || 'http://127.0.0.1:8000'}/api/session/create`, {
+      const aiResponse = await axios.post(`${process.env.AI_BACKEND_URL || 'https://skillomate.onrender.com'}/api/session/create`, {
         user_id: user._id.toString(),
         user_context: userContext
       }, {

@@ -2270,7 +2270,7 @@ const Dashboard = () => {
 
       console.log("Testing backend connection...");
       // const response = await fetch("http://localhost:5000/api/chat/test", {
-      const response = await fetch(`${API_BASE_URL}/api/chat/test` , {
+      const response = await fetch(`${API_BASE_URL}/chat/test` , {
         headers: getAuthHeaders(),
       });
 
