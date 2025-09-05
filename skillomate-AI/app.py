@@ -30,7 +30,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'], 
+CORS(app, origins=[
+    'http://localhost:5173', 
+    'http://localhost:3000', 
+    'http://127.0.0.1:5173', 
+    'http://127.0.0.1:3000',
+    'https://skillomate-ai.onrender.com',
+    'https://skillomate.onrender.com',
+    'https://skillomate-backend.onrender.com'
+], 
      supports_credentials=True, methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 # OpenAI Configuration
