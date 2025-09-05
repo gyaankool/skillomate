@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import login from '../assets/images/login.png';
 import google from '../assets/images/google.png';
 import { Eye, EyeOff } from 'lucide-react';
+import config from '../../env-config.js';
 
 export default function Login() {
   const navigate = useNavigate();
+  const API_BASE_URL = config.API_BASE_URL;
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -29,7 +31,7 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

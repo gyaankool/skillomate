@@ -64,11 +64,13 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import config from '../../env-config.js';
 
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
   const navigate = useNavigate();
+  const API_BASE_URL = config.API_BASE_URL;
   const [chatSessions, setChatSessions] = useState(() => {
     const storedSessions = localStorage.getItem('chatSessions');
     return storedSessions ? JSON.parse(storedSessions) : [];
@@ -95,7 +97,7 @@ export const ChatProvider = ({ children }) => {
         console.log('No token found, skipping chat load');
         return;
       }
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/chat`, {
         method: 'GET',
         headers: getAuthHeaders(),
       });
@@ -120,7 +122,7 @@ export const ChatProvider = ({ children }) => {
   const loadChatMessages = async (chatId) => {
     try {
       console.log('Loading messages for chat:', chatId);
-      const response = await fetch(`http://localhost:5000/api/chat/${chatId}/messages`, {
+      const response = await fetch(`${API_BASE_URL}/chat/${chatId}/messages`, {
         method: 'GET',
         headers: getAuthHeaders(),
       });
@@ -136,7 +138,7 @@ export const ChatProvider = ({ children }) => {
         }
       } else if (response.status === 404) {
         console.warn('Messages endpoint returned 404, checking chat session data');
-        const chatResponse = await fetch(`http://localhost:5000/api/chat/${chatId}`, {
+        const chatResponse = await fetch(`${API_BASE_URL}/chat/${chatId}`, {
           method: 'GET',
           headers: getAuthHeaders(),
         });
@@ -205,7 +207,7 @@ export const ChatProvider = ({ children }) => {
   
   const deleteChat = async (chatId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/chat/${chatId}`, {
+      const response = await fetch(`${API_BASE_URL}/chat/${chatId}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
       });
@@ -232,7 +234,7 @@ export const ChatProvider = ({ children }) => {
         console.log('No token found, cannot create chat');
         return;
       }
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/chat`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ title: 'New Chat' }),

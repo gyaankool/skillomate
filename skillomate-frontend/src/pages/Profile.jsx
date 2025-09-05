@@ -218,7 +218,7 @@ import {
 import Sidebar from "../components/Sidebar";
 import edit from "../assets/images/edit.png";
 import clear from "../assets/images/clear.png";
-import Password from "../assets/images/Password.png";
+import Password from "../assets/images/password.png";
 import download from "../assets/images/download.jpeg";
 import download1 from "../assets/images/download1.jpeg";
 import download2 from "../assets/images/download2.png";

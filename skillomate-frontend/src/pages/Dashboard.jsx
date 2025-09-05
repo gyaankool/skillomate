@@ -2039,7 +2039,7 @@ import mic from "../assets/images/mike.png";
 import send from "../assets/images/send.png";
 import attach from "../assets/images/attach.png";
 import downArrow from "../assets/images/downArrow.png";
-import HexagonalGrid from "./Hex";
+import HexagonalGrid from "./hex";
 import { useChat } from "../context/chatContext";
 import config from "../../env-config.js";
 
@@ -2306,7 +2306,7 @@ const Dashboard = () => {
     }
 
     console.log("Loading chat sessions...");
-    const response = await fetch("http://localhost:5000/api/chat", {
+    const response = await fetch(`${API_BASE_URL}/chat`, {
       method: "GET",
       headers: getAuthHeaders(),
     });
@@ -2355,7 +2355,7 @@ const Dashboard = () => {
   try {
     console.log("Loading messages for chat:", chatId);
     const response = await fetch(
-      `http://localhost:5000/api/chat/${chatId}/messages`,
+      `${API_BASE_URL}/chat/${chatId}/messages`,
       {
         method: "GET",
         headers: getAuthHeaders(),
@@ -2376,7 +2376,7 @@ const Dashboard = () => {
     } else if (response.status === 404) {
       console.warn("Messages endpoint returned 404, checking chat session data");
       // Fallback to loading chat data to get messages
-      const chatResponse = await fetch(`http://localhost:5000/api/chat/${chatId}`, {
+      const chatResponse = await fetch(`${API_BASE_URL}/chat/${chatId}`, {
         method: "GET",
         headers: getAuthHeaders(),
       });
@@ -2412,11 +2412,11 @@ const Dashboard = () => {
         return;
       }
 
-      console.log("Loading chat sessions...");
-      const response = await fetch("http://localhost:5000/api/chat", {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+          console.log("Loading chat sessions...");
+    const response = await fetch(`${API_BASE_URL}/chat`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
 
       console.log("Response status:", response.status);
 
@@ -2442,7 +2442,7 @@ const Dashboard = () => {
 
       // Use the backend endpoint that includes user context
       const response = await fetch(
-        "http://localhost:5000/api/chat/ai-session",
+        `${API_BASE_URL}/chat/ai-session`,
         {
           method: "POST",
           headers: getAuthHeaders(),

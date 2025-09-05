@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import login from '../assets/images/login.png'
 import google from '../assets/images/google.png'
 import { Eye, EyeOff } from 'lucide-react';
+import config from '../../env-config.js';
 
 export default function Signup() {
+  const API_BASE_URL = config.API_BASE_URL;
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -35,7 +37,7 @@ export default function Signup() {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
