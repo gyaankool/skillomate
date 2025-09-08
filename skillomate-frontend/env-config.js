@@ -20,7 +20,7 @@ const PROD_CONFIG = {
   AI_SERVER_URL: 'https://skillomate.onrender.com',
   API_BASE_URL: 'https://skillomate-backend.onrender.com/api',
   SOCKET_URL: 'https://skillomate-backend.onrender.com',
-  DEV_MODE: true
+  DEV_MODE: false
 };
 
 // Export the appropriate configuration based on DEV_MODE
