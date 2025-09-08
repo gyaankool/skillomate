@@ -29,7 +29,7 @@ const PROD_CONFIG = {
     'https://skillomate.onrender.com',
     'https://skillomate-backend.onrender.com'
   ],
-  DEV_MODE: true
+  DEV_MODE: false
 };
 
 // Export the appropriate configuration based on DEV_MODE
