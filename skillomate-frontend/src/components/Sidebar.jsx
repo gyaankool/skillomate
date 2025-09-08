@@ -548,9 +548,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
           </nav>
 
           {!isCollapsed && (
-            <div className="mt-8 px-3">
+            <div className="mt-8 px-3 flex-1 flex flex-col min-h-0">
               <h3 className="text-lg font-semibold mb-4">Previously Asked</h3>
-              <div className="space-y-2">
+              <div className="flex-1 overflow-y-auto max-h-160  space-y-2 pr-2">
                 {chatSessions.length === 0 ? (
                   <p className="text-sm text-gray-200">No chats available</p>
                 ) : (
@@ -589,6 +589,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
                     </div>
                   ))
                 )}
+              </div>
+              <div className="mt-4">
                 <button
                   onClick={() => {
                     createNewChat();

@@ -139,9 +139,26 @@ body {
 }
 
 /* Math expressions styling */
-.ai-formatted-content .math {
+.ai-formatted-content .math-display {
   font-family: 'Times New Roman', serif;
   font-style: italic;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 1.1em;
+}
+
+.ai-formatted-content .math-inline {
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  background-color: #f1f5f9;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95em;
 }
 
 /* Highlight important information */

@@ -247,7 +247,7 @@ export default function Profile() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [userData, setUserData] = useState({
-    username: "Tanya",
+    username: "",
     board: "",
     grade: "",
     profilePicture: "",
@@ -273,29 +273,62 @@ export default function Profile() {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No authentication token found");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
+      
       const data = await response.json();
-      if (data.success) {
+      console.log('Profile fetch response:', data);
+      
+      if (data.success && data.user) {
         setUserData(data.user);
         setEditForm({
-          board: data.user.board,
-          grade: data.user.grade,
-          profilePicture: data.user.profilePicture,
+          board: data.user.board || "",
+          grade: data.user.grade || "",
+          profilePicture: data.user.profilePicture || "",
         });
+      } else {
+        // Fallback to stored user data or default
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          setUserData({
+            username: user.username || user.name || "User",
+            board: user.board || "",
+            grade: user.grade || "",
+            profilePicture: user.profilePicture || "",
+          });
+        } else {
+          setUserData(prev => ({
+            ...prev,
+            username: "User"
+          }));
+        }
+        setError(data.message || "Failed to fetch profile data");
       }
     } catch (err) {
+      console.error('Profile fetch error:', err);
       setError("Failed to fetch profile data");
+      // Set a fallback username
+      setUserData(prev => ({
+        ...prev,
+        username: "User"
+      }));
     }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -385,7 +418,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
+      const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -453,7 +486,7 @@ export default function Profile() {
             className="w-40 h-40 lg:w-60 lg:h-60 rounded-full object-cover"
           />
           <h2 className="text-orange-500 font-semibold mt-2">
-            Hi, {userData.username}
+            Hi, {userData.username || "User"}
           </h2>
         </div>
 

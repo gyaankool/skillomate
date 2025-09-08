@@ -232,7 +232,7 @@ export const ChatProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (!token) {
         console.log('No token found, cannot create chat');
-        return;
+        return null;
       }
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: 'POST',
@@ -247,14 +247,18 @@ export const ChatProvider = ({ children }) => {
           setCurrentChatId(newChat._id);
           setChatHistory([]);
           navigate('/dashboard');
+          return newChat._id; // Return the chat ID
         } else {
           console.error('Error creating chat:', data);
+          return null;
         }
       } else {
         console.error('Error creating chat:', response.status);
+        return null;
       }
     } catch (error) {
       console.error('Error creating new chat:', error);
+      return null;
     }
   };
 

@@ -1734,13 +1734,13 @@
 //   <div className="hidden md:flex flex-col gap-3 mr-4">
 //     <DropdownButton
 //       name="class"
-//       value={selectedClass}
+//       value={chatContext.selectedClass}
 //       options={classOptions}
 //       label="Class 1"
 //     />
 //     <DropdownButton
 //       name="board"
-//       value={selectedBoard}
+//       value={chatContext.selectedBoard}
 //       options={boardOptions}
 //       label="C.B.S.E"
 //     />
@@ -1753,7 +1753,7 @@
 //         type="text"
 //         placeholder="Type or upload your doubt"
 //         value={message}
-//         onChange={(e) => setMessage(e.target.value)}
+//         onChange={handleMessageChange}
 //         onKeyPress={(e) => e.key === "Enter" && sendMessage()}
 //         className="w-full text-gray-600 bg-transparent outline-none mb-6  text-base"
 //       />
@@ -1799,14 +1799,14 @@
 //   <div className="hidden md:flex flex-col gap-3 ml-4">
 //     <DropdownButton
 //       name="subject"
-//       value={selectedSubject}
+//       value={chatContext.selectedSubject}
 //       options={subjectOptions}
 //       label="Subject"
 //       position="right"
 //     />
 //     <DropdownButton
 //       name="answerStyle"
-//       value={selectedAnswerStyle}
+//       value={chatContext.selectedAnswerStyle}
 //       options={answerStyleOptions}
 //       label="Answer style"
 //       position="right"
@@ -1818,25 +1818,25 @@
 //   <div className="grid grid-cols-2 gap-3 mt-4 md:hidden">
 //     <DropdownButton
 //       name="class"
-//       value={selectedClass}
+//       value={chatContext.selectedClass}
 //       options={classOptions}
 //       label="Class 1"
 //     />
 //     <DropdownButton
 //       name="board"
-//       value={selectedBoard}
+//       value={chatContext.selectedBoard}
 //       options={boardOptions}
 //       label="C.B.S.E"
 //     />
 //     <DropdownButton
 //       name="subject"
-//       value={selectedSubject}
+//       value={chatContext.selectedSubject}
 //       options={subjectOptions}
 //       label="Subject"
 //     />
 //     <DropdownButton
 //       name="answerStyle"
-//       value={selectedAnswerStyle}
+//       value={chatContext.selectedAnswerStyle}
 //       options={answerStyleOptions}
 //       label="Answer style"
 //     />
@@ -1881,13 +1881,13 @@
 //   <div className="hidden md:flex flex-col gap-3 mr-4">
 //     <DropdownButton
 //       name="class"
-//       value={selectedClass}
+//       value={chatContext.selectedClass}
 //       options={classOptions}
 //       label="Class 1"
 //     />
 //     <DropdownButton
 //       name="board"
-//       value={selectedBoard}
+//       value={chatContext.selectedBoard}
 //       options={boardOptions}
 //       label="C.B.S.E"
 //     />
@@ -1900,7 +1900,7 @@
 //         type="text"
 //         placeholder="Type or upload your doubt"
 //         value={message}
-//         onChange={(e) => setMessage(e.target.value)}
+//         onChange={handleMessageChange}
 //         onKeyPress={(e) => e.key === "Enter" && sendMessage()}
 //         className="w-full text-gray-600 bg-transparent outline-none mb-6  text-base"
 //       />
@@ -1946,14 +1946,14 @@
 //   <div className="hidden md:flex flex-col gap-3 ml-4">
 //     <DropdownButton
 //       name="subject"
-//       value={selectedSubject}
+//       value={chatContext.selectedSubject}
 //       options={subjectOptions}
 //       label="Subject"
 //       position="right"
 //     />
 //     <DropdownButton
 //       name="answerStyle"
-//       value={selectedAnswerStyle}
+//       value={chatContext.selectedAnswerStyle}
 //       options={answerStyleOptions}
 //       label="Answer style"
 //       position="right"
@@ -1965,25 +1965,25 @@
 //   <div className="grid grid-cols-2 gap-3 mt-4 md:hidden">
 //     <DropdownButton
 //       name="class"
-//       value={selectedClass}
+//       value={chatContext.selectedClass}
 //       options={classOptions}
 //       label="Class 1"
 //     />
 //     <DropdownButton
 //       name="board"
-//       value={selectedBoard}
+//       value={chatContext.selectedBoard}
 //       options={boardOptions}
 //       label="C.B.S.E"
 //     />
 //     <DropdownButton
 //       name="subject"
-//       value={selectedSubject}
+//       value={chatContext.selectedSubject}
 //       options={subjectOptions}
 //       label="Subject"
 //     />
 //     <DropdownButton
 //       name="answerStyle"
-//       value={selectedAnswerStyle}
+//       value={chatContext.selectedAnswerStyle}
 //       options={answerStyleOptions}
 //       label="Answer style"
 //     />
@@ -2027,12 +2027,11 @@
 
 
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import { Plus, Mic, Search } from "lucide-react";
 import Navbar from "../components/Navbar";
 import ChartRenderer from "../components/ChartRenderer";
-import AudioControls from "../components/AudioControls";
 import StreamingText from "../components/StreamingText";
 import InteractiveSuggestions from "../components/InteractiveSuggestions";
 import mic from "../assets/images/mike.png";
@@ -2053,12 +2052,14 @@ const Dashboard = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Dropdown states
+  // Dropdown states - now chat-specific
   const [openDropdown, setOpenDropdown] = useState(null);
-  const [selectedClass, setSelectedClass] = useState("");
-  const [selectedBoard, setSelectedBoard] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("");
-  const [selectedAnswerStyle, setSelectedAnswerStyle] = useState("");
+  const [chatContext, setChatContext] = useState({
+    selectedClass: "",
+    selectedBoard: "",
+    selectedSubject: "",
+    selectedAnswerStyle: ""
+  });
 
   // Chat states
   const [message, setMessage] = useState("");
@@ -2080,6 +2081,80 @@ const Dashboard = () => {
       localStorage.setItem("currentChatId", chatId);
     } else {
       localStorage.removeItem("currentChatId");
+    }
+  };
+
+  // Load chat-specific context
+  const loadChatContext = async (chatId) => {
+    if (!chatId) {
+      setChatContext({
+        selectedClass: "",
+        selectedBoard: "",
+        selectedSubject: "",
+        selectedAnswerStyle: ""
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/chat/${chatId}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data.context) {
+          const context = data.data.context;
+          setChatContext({
+            selectedClass: context.grade || "",
+            selectedBoard: context.board || "",
+            selectedSubject: context.subject || "",
+            selectedAnswerStyle: context.answerStyle || ""
+          });
+          console.log("Loaded chat context:", context);
+        } else {
+          // Reset to default if no context found
+          setChatContext({
+            selectedClass: "",
+            selectedBoard: "",
+            selectedSubject: "",
+            selectedAnswerStyle: ""
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error loading chat context:", error);
+      setChatContext({
+        selectedClass: "",
+        selectedBoard: "",
+        selectedSubject: "",
+        selectedAnswerStyle: ""
+      });
+    }
+  };
+
+  // Save chat-specific context
+  const saveChatContext = async (contextUpdates) => {
+    if (!currentChatId) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/chat/${currentChatId}/context`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ context: contextUpdates }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          console.log("Chat context saved successfully");
+        }
+      } else {
+        console.error("Failed to save chat context");
+      }
+    } catch (error) {
+      console.error("Error saving chat context:", error);
     }
   };
   // const [chatSessions, setChatSessions] = useState([]);
@@ -2131,8 +2206,8 @@ const Dashboard = () => {
     "Simple",
     "Detailed",
     "Step-by-step",
-    "Visual",
-    "Interactive",
+    // "Visual (Coming soon)",
+    // "Interactive (Coming soon)",
   ];
 
   useEffect(() => {
@@ -2140,9 +2215,14 @@ const Dashboard = () => {
     if (userData) {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
-      // Set default values from user data
-      setSelectedClass(parsedUser?.grade || "Class 1");
-      setSelectedBoard(parsedUser?.board || "C.B.S.E");
+      // Set default values from user data (only if no chat context is loaded)
+      if (!currentChatId) {
+        setChatContext(prev => ({
+          ...prev,
+          selectedClass: parsedUser?.grade || "Class 1",
+          selectedBoard: parsedUser?.board || "C.B.S.E"
+        }));
+      }
     }
 
     // Test backend connection
@@ -2152,29 +2232,38 @@ const Dashboard = () => {
     loadChatSessionsAndRestore();
   }, []);
 
+  // Load chat context when currentChatId changes
+  useEffect(() => {
+    if (currentChatId) {
+      loadChatContext(currentChatId);
+    } else {
+      setChatContext({
+        selectedClass: "",
+        selectedBoard: "",
+        selectedSubject: "",
+        selectedAnswerStyle: ""
+      });
+    }
+  }, [currentChatId]);
+
   // Update AI session context when dropdowns change
   useEffect(() => {
-    if (
-      aiSessionId &&
-      (selectedClass || selectedBoard || selectedSubject || selectedAnswerStyle)
-    ) {
-      const contextUpdates = {};
-      if (selectedClass) contextUpdates.grade = selectedClass;
-      if (selectedBoard) contextUpdates.board = selectedBoard;
-      if (selectedSubject) contextUpdates.subject = selectedSubject;
-      if (selectedAnswerStyle)
-        contextUpdates.answer_style = selectedAnswerStyle;
+    if (aiSessionId) {
+      const contextUpdates = {
+        grade: chatContext.selectedClass || "Class 8",
+        board: chatContext.selectedBoard || "C.B.S.E",
+        subject: chatContext.selectedSubject || "General",
+        answer_style: chatContext.selectedAnswerStyle || "Detailed",
+      };
 
-      // Only update if we have changes
-      if (Object.keys(contextUpdates).length > 0) {
-        updateAiSessionContext(contextUpdates);
-      }
+      // Always update with current context (including defaults)
+      updateAiSessionContext(contextUpdates);
     }
   }, [
-    selectedClass,
-    selectedBoard,
-    selectedSubject,
-    selectedAnswerStyle,
+    chatContext.selectedClass,
+    chatContext.selectedBoard,
+    chatContext.selectedSubject,
+    chatContext.selectedAnswerStyle,
     aiSessionId,
   ]);
 
@@ -2458,11 +2547,10 @@ const Dashboard = () => {
 
           // Update AI session with current dropdown selections
           const contextUpdates = {};
-          if (selectedClass) contextUpdates.grade = selectedClass;
-          if (selectedBoard) contextUpdates.board = selectedBoard;
-          if (selectedSubject) contextUpdates.subject = selectedSubject;
-          if (selectedAnswerStyle)
-            contextUpdates.answer_style = selectedAnswerStyle;
+          contextUpdates.grade = chatContext.selectedClass || "Class 8";
+          contextUpdates.board = chatContext.selectedBoard || "C.B.S.E";
+          contextUpdates.subject = chatContext.selectedSubject || "General";
+          contextUpdates.answer_style = chatContext.selectedAnswerStyle || "Detailed";
 
           if (Object.keys(contextUpdates).length > 0) {
             await updateAiSessionContext(contextUpdates);
@@ -2490,8 +2578,12 @@ const Dashboard = () => {
 
 
   const addMessageToChat = async (message) => {
-    if (!currentChatId) {
-      console.log("No current chat ID, cannot add message");
+    await addMessageToChatWithId(message, currentChatId);
+  };
+
+  const addMessageToChatWithId = async (message, chatId) => {
+    if (!chatId) {
+      console.log("No chat ID provided, cannot add message");
       return;
     }
 
@@ -2502,9 +2594,9 @@ const Dashboard = () => {
         return;
       }
 
-      console.log("Adding message to chat:", currentChatId);
+      console.log("Adding message to chat:", chatId);
       const response = await fetch(
-        `http://localhost:5000/api/chat/${currentChatId}/messages`,
+        `http://localhost:5000/api/chat/${chatId}/messages`,
         {
           method: "POST",
           headers: getAuthHeaders(),
@@ -2520,7 +2612,7 @@ const Dashboard = () => {
         if (data.success) {
           // Don't overwrite local chat history, just update chat sessions
           setChatSessions((prev) =>
-            prev.map((chat) => (chat._id === currentChatId ? data.data : chat))
+            prev.map((chat) => (chat._id === chatId ? data.data : chat))
           );
         }
       } else {
@@ -2539,10 +2631,15 @@ const Dashboard = () => {
   };
 
   const updateAiSessionContext = async (contextUpdates) => {
-    if (!aiSessionId) return;
+    if (!aiSessionId) {
+      console.log("No AI session ID available for context update");
+      return;
+    }
 
     try {
       console.log("Updating AI session context:", contextUpdates);
+      console.log("AI Server URL:", AI_SERVER_URL);
+      console.log("Session ID:", aiSessionId);
 
       const response = await fetch(
         `${AI_SERVER_URL}/api/session/${aiSessionId}/context`,
@@ -2557,47 +2654,58 @@ const Dashboard = () => {
         }
       );
 
+      console.log("Context update response status:", response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log("Context update response data:", data);
         if (data.success) {
           console.log("AI session context updated successfully");
+        } else {
+          console.error("AI session context update failed:", data.error);
         }
       } else {
-        console.error("Failed to update AI session context");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Failed to update AI session context:", response.status, errorData);
       }
     } catch (error) {
       console.error("Error updating AI session context:", error);
     }
   };
 
-  const handleOptionSelect = (dropdownName, value) => {
+  const handleOptionSelect = async (dropdownName, value) => {
     let contextUpdates = {};
+    let newContext = { ...chatContext };
 
     switch (dropdownName) {
       case "class":
-        setSelectedClass(value);
+        newContext.selectedClass = value;
         contextUpdates = { grade: value };
         break;
       case "board":
-        setSelectedBoard(value);
+        newContext.selectedBoard = value;
         contextUpdates = { board: value };
         break;
       case "subject":
-        setSelectedSubject(value);
+        newContext.selectedSubject = value;
         contextUpdates = { subject: value };
         break;
       case "answerStyle":
-        setSelectedAnswerStyle(value);
-        contextUpdates = { answer_style: value };
+        newContext.selectedAnswerStyle = value;
+        contextUpdates = { answerStyle: value };
         break;
       default:
         break;
     }
 
+    // Update local state
+    setChatContext(newContext);
     setOpenDropdown(null);
 
-    // Update AI session context if we have changes
+    // Save to backend
     if (Object.keys(contextUpdates).length > 0) {
+      await saveChatContext(contextUpdates);
+      // Also update AI session context
       updateAiSessionContext(contextUpdates);
     }
   };
@@ -2610,16 +2718,28 @@ const Dashboard = () => {
     }, 100);
   };
 
+  const handleMessageChange = useCallback((e) => {
+    setMessage(e.target.value);
+  }, []);
+
   const sendMessage = async () => {
     if (!message.trim()) return;
 
     // Create new chat if none exists
     if (!currentChatId) {
-      await createNewChat();
-      // Wait a bit for the chat to be created
-      setTimeout(async () => {
-        await processMessage();
-      }, 100);
+      try {
+        const newChatId = await createNewChat();
+        if (newChatId) {
+          // Use the returned chat ID directly
+          await processMessageWithChatId(newChatId);
+        } else {
+          console.error("Failed to create chat");
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Error creating new chat:", error);
+        setIsLoading(false);
+      }
       return;
     }
 
@@ -2649,12 +2769,17 @@ const Dashboard = () => {
   };
 
   const processMessage = async () => {
+    await processMessageWithChatId(currentChatId);
+  };
+
+  const processMessageWithChatId = async (chatId) => {
     const userMessage = message.trim();
     setMessage("");
     setIsLoading(true);
 
     console.log("Processing message:", userMessage);
     console.log("Current chat history length:", chatHistory.length);
+    console.log("Using chat ID:", chatId);
 
     // Add user message to chat
     const newUserMessage = {
@@ -2672,8 +2797,8 @@ const Dashboard = () => {
 
     console.log("Updated chat history length:", updatedHistory.length);
 
-    // Save user message to backend
-    await addMessageToChat(newUserMessage);
+    // Save user message to backend with specific chat ID
+    await addMessageToChatWithId(newUserMessage, chatId);
 
     try {
       const response = await fetch(`${AI_SERVER_URL}/api/chat`, {
@@ -2685,10 +2810,10 @@ const Dashboard = () => {
           message: userMessage,
           session_id: aiSessionId,
           context: {
-            grade: selectedClass,
-            subject: selectedSubject,
-            board: selectedBoard,
-            answer_style: selectedAnswerStyle,
+            grade: chatContext.selectedClass || "Class 8",
+            subject: chatContext.selectedSubject || "General",
+            board: chatContext.selectedBoard || "C.B.S.E",
+            answer_style: chatContext.selectedAnswerStyle || "Detailed",
           },
         }),
       });
@@ -2732,7 +2857,7 @@ const Dashboard = () => {
         console.log("AI message added to history");
 
         // Save AI message to backend
-        await addMessageToChat(aiMessage);
+        await addMessageToChatWithId(aiMessage, chatId);
 
         // Check if this is a chart request and generate chart if needed
         if (isChartRequest(userMessage)) {
@@ -2750,7 +2875,7 @@ const Dashboard = () => {
 
             const historyWithChart = [...finalHistory, chartMessage];
             setChatHistory(historyWithChart);
-            await addMessageToChat(chartMessage);
+            await addMessageToChatWithId(chartMessage, chatId);
           } else {
             console.error("Failed to generate chart data");
           }
@@ -2844,10 +2969,10 @@ const Dashboard = () => {
 
     // Add context and session_id to voice input
     const context = {
-      grade: selectedClass,
-      subject: selectedSubject,
-      board: selectedBoard,
-      answer_style: selectedAnswerStyle,
+      grade: chatContext.selectedClass || "Class 8",
+      subject: chatContext.selectedSubject || "General",
+      board: chatContext.selectedBoard || "C.B.S.E",
+      answer_style: chatContext.selectedAnswerStyle || "Detailed",
     };
 
     formData.append("context", JSON.stringify(context));
@@ -3150,27 +3275,50 @@ const Dashboard = () => {
 
     if (!content) return "";
 
-    // Clean up the content first
+    // Clean up the content and improve formatting
     let cleanedContent = content
-      // Remove LaTeX math notation and replace with readable text
-      .replace(/\\\(/g, "")
-      .replace(/\\\)/g, "")
-      // Remove extra whitespace
-      .replace(/\s+/g, " ")
+      // Convert LaTeX math notation to proper HTML math display
+      .replace(/\\\[(.*?)\\\]/g, '<div class="math-display">$1</div>')
+      .replace(/\\\((.*?)\\\)/g, '<span class="math-inline">$1</span>')
+      // Handle standalone LaTeX expressions (like \frac{4}{8})
+      .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="math-inline">$1/$2</span>')
+      .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="math-inline">$1/$2</span>')
+      // Fix common formatting issues
+      .replace(/Thereforelution:/g, 'Therefore, solution:')
+      .replace(/Therefore,/g, 'Therefore, ')
+      .replace(/\s+/g, ' ')
       .trim();
 
-    // Split into paragraphs and format properly
-    const paragraphs = cleanedContent.split("\n\n").filter((p) => p.trim());
+    // Split content into logical sections based on common patterns
+    const sections = cleanedContent
+      .split(/(?=Given:|To Find:|Solution:|Answer:|Therefore,|Step \d+:|Thereforelution:)/i)
+      .filter(section => section.trim());
 
-    if (paragraphs.length === 1) {
-      // Single paragraph
-      return sanitizeHTML(`<p>${paragraphs[0]}</p>`);
+    if (sections.length <= 1) {
+      // Single section - try to split by sentences for better formatting
+      const sentences = cleanedContent.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+      if (sentences.length > 1) {
+        const formattedSentences = sentences
+          .map(sentence => `<p class="mb-2">${sentence.trim()}</p>`)
+          .join('');
+        return sanitizeHTML(formattedSentences);
+      } else {
+        return sanitizeHTML(`<p>${cleanedContent}</p>`);
+      }
     } else {
-      // Multiple paragraphs
-      const formattedParagraphs = paragraphs
-        .map((p) => `<p>${p.trim()}</p>`)
-        .join("");
-      return sanitizeHTML(formattedParagraphs);
+      // Multiple sections - format each section properly
+      const formattedSections = sections.map(section => {
+        const trimmedSection = section.trim();
+        if (trimmedSection.match(/^(Given|To Find|Solution|Answer|Therefore,|Step \d+):/i)) {
+          // This is a section header
+          const headerText = trimmedSection.replace(/^(Given|To Find|Solution|Answer|Therefore,|Step \d+):/i, '$1:');
+          const content = trimmedSection.replace(/^(Given|To Find|Solution|Answer|Therefore,|Step \d+):/i, '').trim();
+          return `<div class="mb-3"><h4 class="font-semibold text-gray-800 mb-1">${headerText}</h4><p class="ml-2">${content}</p></div>`;
+        } else {
+          return `<p class="mb-2">${trimmedSection}</p>`;
+        }
+      });
+      return sanitizeHTML(formattedSections.join(''));
     }
   };
 
@@ -3202,7 +3350,10 @@ const Dashboard = () => {
         <div
           className={`absolute ${
             position === "right" ? "right-0" : "left-0"
-          } top-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 min-w-[150px] max-h-48 overflow-y-auto`}
+          } ${
+            // For right-positioned dropdowns (like answer style), show above if near bottom of screen
+            position === "right" ? "bottom-full mb-1" : "top-full mt-1"
+          } bg-white border border-gray-300 rounded-lg shadow-lg z-50 min-w-[150px] max-h-48 overflow-y-auto`}
         >
           {options.map((option) => (
             <button
@@ -3218,7 +3369,7 @@ const Dashboard = () => {
     </div>
   );
 
-  const ChatMessage = ({ message }) => {
+  const ChatMessage = React.memo(({ message }) => {
     console.log("ChatMessage render:", {
       type: message.type,
       isFormatted: message.isFormatted,
@@ -3278,31 +3429,6 @@ const Dashboard = () => {
               isStreaming={message.isStreaming || false}
             />
           )}
-          {message.type === "ai" && (
-            <AudioControls
-              isPlaying={isPlaying}
-              isGenerating={isGeneratingAudio}
-              currentAudioId={currentAudioId}
-              messageId={message.id}
-              audioProgress={audioProgress}
-              playbackSpeed={playbackSpeed}
-              onPlayPause={() =>
-                playAudioResponse(
-                  message.content,
-                  message.originalText,
-                  message.id
-                )
-              }
-              onStop={stopAudio}
-              onSpeedChange={changePlaybackSpeed}
-              onSkip={skipAudio}
-              isCached={
-                !!audioCache[
-                  `${message.id}_${message.originalText?.substring(0, 50)}`
-                ]
-              }
-            />
-          )}
           {message.type === "ai" &&
             message.suggestions &&
             message.suggestions.length > 0 && (
@@ -3314,7 +3440,14 @@ const Dashboard = () => {
         </div>
       </div>
     );
-  };
+  });
+
+  // Memoize chat history rendering to prevent unnecessary re-renders
+  const memoizedChatHistory = useMemo(() => 
+    chatHistory.map((msg) => (
+      <ChatMessage key={msg.id} message={msg} />
+    )), [chatHistory]
+  );
 
   const formatTextContent = (content) => {
     if (!content) return "";
@@ -3394,9 +3527,9 @@ const Dashboard = () => {
 
       // Extract context from the request
       const context = {
-        board: selectedBoard || "CBSE",
-        grade: selectedClass || "8",
-        subject: "Mathematics", // Default subject, can be enhanced
+        board: chatContext.selectedBoard || "C.B.S.E",
+        grade: chatContext.selectedClass || "Class 8",
+        subject: chatContext.selectedSubject || "Mathematics", // Use selected subject or default to Mathematics
       };
 
       const response = await fetch(`${AI_SERVER_URL}/api/diagram`, {
@@ -3486,15 +3619,17 @@ const Dashboard = () => {
   <div className="hidden md:flex flex-col gap-3 mr-4">
     <DropdownButton
       name="class"
-      value={selectedClass}
+      value={chatContext.selectedClass}
       options={classOptions}
       label="Class 1"
+      position="right"
     />
     <DropdownButton
       name="board"
-      value={selectedBoard}
+      value={chatContext.selectedBoard}
       options={boardOptions}
       label="C.B.S.E"
+      position="right"
     />
   </div>
 
@@ -3505,7 +3640,7 @@ const Dashboard = () => {
         type="text"
         placeholder="Type or upload your doubt"
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleMessageChange}
         onKeyPress={(e) => e.key === "Enter" && sendMessage()}
         className="w-full text-gray-600 bg-transparent outline-none mb-6  text-base"
       />
@@ -3551,14 +3686,14 @@ const Dashboard = () => {
   <div className="hidden md:flex flex-col gap-3 ml-4">
     <DropdownButton
       name="subject"
-      value={selectedSubject}
+      value={chatContext.selectedSubject}
       options={subjectOptions}
       label="Subject"
       position="right"
     />
     <DropdownButton
       name="answerStyle"
-      value={selectedAnswerStyle}
+      value={chatContext.selectedAnswerStyle}
       options={answerStyleOptions}
       label="Answer style"
       position="right"
@@ -3570,25 +3705,25 @@ const Dashboard = () => {
   <div className="grid grid-cols-2 gap-3 mt-4 md:hidden">
     <DropdownButton
       name="class"
-      value={selectedClass}
+      value={chatContext.selectedClass}
       options={classOptions}
       label="Class 1"
     />
     <DropdownButton
       name="board"
-      value={selectedBoard}
+      value={chatContext.selectedBoard}
       options={boardOptions}
       label="C.B.S.E"
     />
     <DropdownButton
       name="subject"
-      value={selectedSubject}
+      value={chatContext.selectedSubject}
       options={subjectOptions}
       label="Subject"
     />
     <DropdownButton
       name="answerStyle"
-      value={selectedAnswerStyle}
+      value={chatContext.selectedAnswerStyle}
       options={answerStyleOptions}
       label="Answer style"
     />
@@ -3604,9 +3739,7 @@ const Dashboard = () => {
             <>
               {/* Chat Area */}
               <div className="flex-1 p-4 mb-4 overflow-y-auto">
-                {chatHistory.map((msg) => (
-                  <ChatMessage key={msg.id} message={msg} />
-                ))}
+                {memoizedChatHistory}
                 {isLoading && (
                   <div className="flex justify-start mb-4">
                     <div className="bg-white bg-opacity-80 p-3 rounded-lg backdrop-blur-sm">
@@ -3633,15 +3766,17 @@ const Dashboard = () => {
   <div className="hidden md:flex flex-col gap-3 mr-4">
     <DropdownButton
       name="class"
-      value={selectedClass}
+      value={chatContext.selectedClass}
       options={classOptions}
       label="Class 1"
+      position="right"
     />
     <DropdownButton
       name="board"
-      value={selectedBoard}
+      value={chatContext.selectedBoard}
       options={boardOptions}
       label="C.B.S.E"
+      position="right"
     />
   </div>
 
@@ -3652,7 +3787,7 @@ const Dashboard = () => {
         type="text"
         placeholder="Type or upload your doubt"
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleMessageChange}
         onKeyPress={(e) => e.key === "Enter" && sendMessage()}
         className="w-full text-gray-600 bg-transparent outline-none mb-6  text-base"
       />
@@ -3698,14 +3833,14 @@ const Dashboard = () => {
   <div className="hidden md:flex flex-col gap-3 ml-4">
     <DropdownButton
       name="subject"
-      value={selectedSubject}
+      value={chatContext.selectedSubject}
       options={subjectOptions}
       label="Subject"
       position="right"
     />
     <DropdownButton
       name="answerStyle"
-      value={selectedAnswerStyle}
+      value={chatContext.selectedAnswerStyle}
       options={answerStyleOptions}
       label="Answer style"
       position="right"
@@ -3717,25 +3852,25 @@ const Dashboard = () => {
   <div className="grid grid-cols-2 gap-3 mt-4 md:hidden">
     <DropdownButton
       name="class"
-      value={selectedClass}
+      value={chatContext.selectedClass}
       options={classOptions}
       label="Class 1"
     />
     <DropdownButton
       name="board"
-      value={selectedBoard}
+      value={chatContext.selectedBoard}
       options={boardOptions}
       label="C.B.S.E"
     />
     <DropdownButton
       name="subject"
-      value={selectedSubject}
+      value={chatContext.selectedSubject}
       options={subjectOptions}
       label="Subject"
     />
     <DropdownButton
       name="answerStyle"
-      value={selectedAnswerStyle}
+      value={chatContext.selectedAnswerStyle}
       options={answerStyleOptions}
       label="Answer style"
     />

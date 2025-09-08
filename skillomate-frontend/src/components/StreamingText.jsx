@@ -88,14 +88,25 @@ const StreamingText = ({ content, isStreaming = false, onComplete }) => {
           elements.push(<br key={index} />);
         } else {
           let formattedLine = line;
+          // Handle mathematical expressions
+          formattedLine = formattedLine.replace(/\\\[(.*?)\\\]/g, '<div class="math-display my-2 p-2 bg-gray-50 rounded border-l-4 border-blue-400">$1</div>');
+          formattedLine = formattedLine.replace(/\\\((.*?)\\\)/g, '<span class="math-inline bg-gray-100 px-1 rounded">$1</span>');
+          // Handle LaTeX fractions
+          formattedLine = formattedLine.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="math-inline bg-gray-100 px-1 rounded">$1/$2</span>');
+          // Handle bold and italic text
           formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
           formattedLine = formattedLine.replace(/\*(.*?)\*/g, '<em>$1</em>');
+          // Handle inline code
           formattedLine = formattedLine.replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 rounded text-xs">$1</code>');
+          // Handle step numbers and structure
+          formattedLine = formattedLine.replace(/^(\d+\.\s)/g, '<span class="font-semibold text-blue-600">$1</span>');
+          // Handle "Therefore" and other logical connectors
+          formattedLine = formattedLine.replace(/(Therefore,|Thereforelution:)/g, '<span class="font-semibold text-green-600">$1</span>');
           
           elements.push(
             <p 
               key={index} 
-              className="mb-2"
+              className="mb-2 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: formattedLine }}
             />
           );
