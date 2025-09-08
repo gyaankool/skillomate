@@ -7,7 +7,7 @@
 
 import os
 
-DEV_MODE = True  # Change this to False for production
+DEV_MODE = False  # Change this to False for production
 
 # Development Configuration (localhost)
 DEV_CONFIG = {
@@ -18,7 +18,7 @@ DEV_CONFIG = {
         'http://127.0.0.1:3000'
     ],
     'BACKEND_URL': 'http://localhost:5000',
-    'DEV_MODE': False
+    'DEV_MODE': True
 }
 
 # Production Configuration (hosted URLs)
@@ -29,7 +29,7 @@ PROD_CONFIG = {
         'https://skillomate-backend.onrender.com'
     ],
     'BACKEND_URL': 'https://skillomate-backend.onrender.com',
-    'DEV_MODE': True
+    'DEV_MODE': False
 }
 
 # Export the appropriate configuration based on DEV_MODE
