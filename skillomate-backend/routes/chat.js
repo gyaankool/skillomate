@@ -5,6 +5,7 @@ const Chat = require('../models/Chat');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { handleValidationErrors } = require('../middleware/validate');
+const envConfig = require('../config/environment');
 
 const router = express.Router();
 
@@ -327,10 +328,10 @@ router.post('/ai-session', async (req, res) => {
     // Call AI backend to create session with user context
     try {
       console.log('Attempting to connect to AI backend...');
-      console.log('AI Backend URL:', `${process.env.AI_BACKEND_URL || 'https://skillomate.onrender.com'}/api/session/create`);
+      console.log('AI Backend URL:', `${envConfig.AI_BACKEND_URL}/api/session/create`);
       console.log('User context being sent:', userContext);
       
-      const aiResponse = await axios.post(`${process.env.AI_BACKEND_URL || 'https://skillomate.onrender.com'}/api/session/create`, {
+      const aiResponse = await axios.post(`${envConfig.AI_BACKEND_URL}/api/session/create`, {
         user_id: user._id.toString(),
         user_context: userContext
       }, {
@@ -408,6 +409,71 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to delete chat session'
+    });
+  }
+});
+
+// @desc    Update chat context
+// @route   PUT /api/chat/:id/context
+// @access  Private
+router.put('/:id/context', async (req, res) => {
+  try {
+    const { context } = req.body;
+    const chatId = req.params.id;
+
+    // Validate chat exists and belongs to user
+    const chat = await Chat.findOne({ 
+      _id: chatId, 
+      userId: req.user.id, 
+      isActive: true 
+    });
+
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        error: 'Chat not found'
+      });
+    }
+
+    // Validate context data
+    const validGrades = ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
+    const validSubjects = ['Mathematics', 'Science', 'English', 'Hindi', 'Social Studies', 'Computer Science', 'Physics', 'Chemistry', 'Biology', 'History', 'Geography', 'Economics'];
+    const validBoards = ['C.B.S.E', 'I.C.S.E', 'State Board', 'International Board'];
+    const validAnswerStyles = ['Simple', 'Detailed', 'Step-by-step', 'Visual', 'Interactive'];
+
+    const cleanContext = {};
+
+    if (context && typeof context === 'object') {
+      if (context.grade && validGrades.includes(context.grade)) {
+        cleanContext.grade = context.grade;
+      }
+      if (context.subject && validSubjects.includes(context.subject)) {
+        cleanContext.subject = context.subject;
+      }
+      if (context.board && validBoards.includes(context.board)) {
+        cleanContext.board = context.board;
+      }
+      if (context.answerStyle && validAnswerStyles.includes(context.answerStyle)) {
+        cleanContext.answerStyle = context.answerStyle;
+      }
+    }
+
+    // Update chat context
+    chat.context = { ...chat.context, ...cleanContext };
+    await chat.save();
+
+    res.json({
+      success: true,
+      message: 'Chat context updated successfully',
+      data: {
+        context: chat.context
+      }
+    });
+  } catch (error) {
+    console.error('Error updating chat context:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update chat context'
     });
   }
 });

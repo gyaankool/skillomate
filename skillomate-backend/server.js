@@ -7,6 +7,7 @@ require('dotenv').config();
 const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const chatRoutes = require('./routes/chat');
+const envConfig = require('./config/environment');
 
 const app = express();
 
@@ -26,12 +27,9 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// CORS configuration
+// CORS configuration - using environment config
 const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'https://skillomate-ai.onrender.com',
-  'https://skillomate.onrender.com',
+  ...envConfig.CORS_ORIGINS,
   process.env.FRONTEND_URL
 ].filter(Boolean); // Remove any undefined values
 
