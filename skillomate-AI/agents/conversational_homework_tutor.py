@@ -35,6 +35,11 @@ class ConversationalHomeworkTutor:
         Generate a conversational, interactive response for homework help
         """
         try:
+            # Get answer style from user context
+            answer_style = user_context.get('answer_style', 'Detailed') if user_context else 'Detailed'
+            logger.info(f"Answer style: {answer_style}")
+            logger.info(f"User context received: {user_context}")
+            
             # Analyze the question type
             question_type = self._analyze_question_type(question)
             logger.info(f"Question: '{question}' -> Detected type: {question_type}")
@@ -48,19 +53,19 @@ class ConversationalHomeworkTutor:
                 return self._handle_identity(question, user_context, conversation_history, context_data)
             elif question_type == "math_problem":
                 logger.info("Handling as math problem")
-                return self._handle_math_problem(question, user_context, conversation_history, context_data)
+                return self._handle_math_problem(question, user_context, conversation_history, context_data, answer_style)
             elif question_type == "concept_explanation":
                 logger.info("Handling as concept explanation")
-                return self._handle_concept_explanation(question, user_context, conversation_history, context_data)
+                return self._handle_concept_explanation(question, user_context, conversation_history, context_data, answer_style)
             elif question_type == "step_by_step":
                 logger.info("Handling as step-by-step")
-                return self._handle_step_by_step(question, user_context, conversation_history, context_data)
+                return self._handle_step_by_step(question, user_context, conversation_history, context_data, answer_style)
             elif question_type == "factual":
                 logger.info("Handling as factual question")
-                return self._handle_factual_question(question, user_context, context_data)
+                return self._handle_factual_question(question, user_context, context_data, answer_style)
             else:
                 logger.info("Handling as general question")
-                return self._handle_general_question(question, user_context, conversation_history, context_data)
+                return self._handle_general_question(question, user_context, conversation_history, context_data, answer_style)
                 
         except Exception as e:
             logger.error(f"Error in conversational response: {str(e)}")
@@ -158,7 +163,8 @@ class ConversationalHomeworkTutor:
         }
     
     def _handle_math_problem(self, question: str, user_context: Optional[Dict], 
-                           conversation_history: List[Dict], context_data: Optional[Dict] = None) -> Dict[str, Any]:
+                           conversation_history: List[Dict], context_data: Optional[Dict] = None, 
+                           answer_style: str = "Detailed") -> Dict[str, Any]:
         """Handle math problems with interactive guidance"""
         
         # Create a homework-focused prompt for math problems with context
@@ -168,12 +174,22 @@ class ConversationalHomeworkTutor:
         
         # Removed follow-up info to prevent intro phrases
         
+        # Get answer style instructions and subject info
+        style_instructions = self._get_answer_style_instructions(answer_style)
+        selected_subject = user_context.get('subject', 'Mathematics') if user_context else 'Mathematics'
+        subject_info = self._get_subject_info(selected_subject)
+        
         prompt = f"""You are Skillomate, a helpful homework assistant for Indian students.
 
 STUDENT CONTEXT:
 - Name: {user_context.get('name', 'Student') if user_context else 'Student'}
 - Grade: {user_context.get('grade', 'Class 8') if user_context else 'Class 8'}
-- Board: {user_context.get('board', 'CBSE') if user_context else 'CBSE'}{context_info}
+- Board: {user_context.get('board', 'CBSE') if user_context else 'CBSE'}
+- Subject: {selected_subject}
+- Answer Style: {answer_style}{context_info}
+
+SUBJECT EXPERTISE:
+{subject_info}
 
 RESPONSE REQUIREMENTS:
 1. Use GUIDED LEARNING - don't give direct answers
@@ -182,10 +198,12 @@ RESPONSE REQUIREMENTS:
 4. Use Indian context: ₹ currency, Indian examples, local references
 5. Include the mathematical answer clearly
 6. Guide step-by-step appropriate for the grade level
+7. ANSWER STYLE: {style_instructions}
+8. SUBJECT FOCUS: Emphasize {selected_subject} concepts and examples
 
 MATH PROBLEM: {question}
 
-Provide a structured response with clear guidance and include the solution following board-specific format."""
+Provide a structured response with clear guidance and include the solution following board-specific format and the requested answer style."""
 
         response = self.client.chat.completions.create(
             model="gpt-4o-mini",
@@ -219,7 +237,8 @@ Provide a structured response with clear guidance and include the solution follo
         }
     
     def _handle_concept_explanation(self, question: str, user_context: Optional[Dict], 
-                                  conversation_history: List[Dict], context_data: Optional[Dict] = None) -> Dict[str, Any]:
+                                  conversation_history: List[Dict], context_data: Optional[Dict] = None, 
+                                  answer_style: str = "Detailed") -> Dict[str, Any]:
         """Handle concept explanations conversationally"""
         
         # Add context information
@@ -229,11 +248,22 @@ Provide a structured response with clear guidance and include the solution follo
         
         # Removed follow-up info to prevent intro phrases
         
+        # Get answer style instructions and subject info
+        style_instructions = self._get_answer_style_instructions(answer_style)
+        selected_subject = user_context.get('subject', 'General') if user_context else 'General'
+        subject_info = self._get_subject_info(selected_subject)
+        
         prompt = f"""You are a homework assistant helping a student understand a concept through GUIDED LEARNING.
 
 STUDENT INFO:
 - Name: {user_context.get('name', 'Student') if user_context else 'Student'}
-- Grade: {user_context.get('grade', 'middle school') if user_context else 'middle school'}{context_info}
+- Grade: {user_context.get('grade', 'middle school') if user_context else 'middle school'}
+- Subject: {selected_subject}
+- Board: {user_context.get('board', 'CBSE') if user_context else 'CBSE'}
+- Answer Style: {answer_style}{context_info}
+
+SUBJECT EXPERTISE:
+{subject_info}
 
 YOUR GUIDED LEARNING STYLE:
 - Start with a simple introduction to the concept
@@ -242,6 +272,8 @@ YOUR GUIDED LEARNING STYLE:
 - Guide them to make connections
 - Don't overwhelm with too much information at once
 - Build upon previous explanations when relevant
+- ANSWER STYLE: {style_instructions}
+- SUBJECT FOCUS: Emphasize {selected_subject} concepts and examples
 
 CONCEPT THEY NEED HELP WITH: {question}
 
@@ -251,6 +283,8 @@ Explain this concept as their helpful homework buddy who:
 3. Asks them to think about it
 4. Offers to explain more if needed
 5. References previous discussions when relevant
+6. Follows the requested answer style
+7. Focuses on {selected_subject} when relevant
 
 KEEP IT GUIDED: Under 60 words, encourage them to think and ask questions."""
 
@@ -286,7 +320,8 @@ KEEP IT GUIDED: Under 60 words, encourage them to think and ask questions."""
         }
     
     def _handle_step_by_step(self, question: str, user_context: Optional[Dict], 
-                           conversation_history: List[Dict], context_data: Optional[Dict] = None) -> Dict[str, Any]:
+                           conversation_history: List[Dict], context_data: Optional[Dict] = None, 
+                           answer_style: str = "Detailed") -> Dict[str, Any]:
         """Handle step-by-step guidance conversationally"""
         
         # Add context information
@@ -347,7 +382,7 @@ Give them just the FIRST STEP and ask if they can do it. Don't give all steps at
             ]
         }
     
-    def _handle_factual_question(self, question: str, user_context: Optional[Dict], context_data: Optional[Dict] = None) -> Dict[str, Any]:
+    def _handle_factual_question(self, question: str, user_context: Optional[Dict], context_data: Optional[Dict] = None, answer_style: str = "Detailed") -> Dict[str, Any]:
         """Handle factual questions conversationally"""
         
         # Add context information
@@ -406,7 +441,8 @@ Give a simple, conversational answer."""
         }
     
     def _handle_general_question(self, question: str, user_context: Optional[Dict], 
-                               conversation_history: List[Dict], context_data: Optional[Dict] = None) -> Dict[str, Any]:
+                               conversation_history: List[Dict], context_data: Optional[Dict] = None, 
+                               answer_style: str = "Detailed") -> Dict[str, Any]:
         """Handle general questions conversationally"""
         
         # Add context information
@@ -416,11 +452,24 @@ Give a simple, conversational answer."""
         
         # Removed follow-up info to prevent intro phrases
         
+        # Get answer style instructions
+        style_instructions = self._get_answer_style_instructions(answer_style)
+        
+        # Get subject-specific information
+        selected_subject = user_context.get('subject', 'General') if user_context else 'General'
+        subject_info = self._get_subject_info(selected_subject)
+        
         prompt = f"""You are a homework assistant helping a student through GUIDED LEARNING.
 
 STUDENT INFO:
 - Name: {user_context.get('name', 'Student') if user_context else 'Student'}
-- Grade: {user_context.get('grade', 'middle school') if user_context else 'middle school'}{context_info}
+- Grade: {user_context.get('grade', 'middle school') if user_context else 'middle school'}
+- Subject: {selected_subject}
+- Board: {user_context.get('board', 'CBSE') if user_context else 'CBSE'}
+- Answer Style: {answer_style}{context_info}
+
+SUBJECT EXPERTISE:
+{subject_info}
 
 YOUR GUIDED LEARNING APPROACH:
 - Guide them to discover answers themselves
@@ -429,6 +478,8 @@ YOUR GUIDED LEARNING APPROACH:
 - Ask questions to help them think
 - Connect concepts to what they already know
 - Build upon previous discussions when relevant
+- ANSWER STYLE: {style_instructions}
+- SUBJECT FOCUS: When asked about subjects or capabilities, emphasize your expertise in {selected_subject}
 
 HOMEWORK QUESTION: {question}
 
@@ -438,6 +489,8 @@ Answer as their helpful homework assistant who:
 3. Asks questions to help them understand
 4. Encourages them to explore further
 5. References previous discussions when relevant
+6. Follows the requested answer style
+7. Focuses on {selected_subject} when relevant
 
 KEEP IT GUIDED: Under 50 words, encourage thinking and discovery."""
 
@@ -505,3 +558,35 @@ KEEP IT GUIDED: Under 50 words, encourage thinking and discovery."""
         import random
         prompts = follow_up_prompts.get(question_type, follow_up_prompts["general"])
         return random.choice(prompts)
+    
+    def _get_answer_style_instructions(self, answer_style: str) -> str:
+        """Get specific instructions for different answer styles"""
+        style_instructions = {
+            "Simple": "Keep explanations very simple and brief. Use basic vocabulary and short sentences. Focus on the essential points only.",
+            "Detailed": "Provide comprehensive explanations with examples, analogies, and thorough coverage of the topic. Include background information and context.",
+            "Step-by-step": "Break down the solution into clear, numbered steps. Show each step with explanations. Make it easy to follow along.",
+            "Visual": "Include descriptions of diagrams, charts, or visual aids. Use spatial language and describe visual elements clearly.",
+            "Interactive": "Ask questions to engage the student. Include interactive elements and encourage participation. Make it conversational."
+        }
+        
+        return style_instructions.get(answer_style, style_instructions["Detailed"])
+    
+    def _get_subject_info(self, subject: str) -> str:
+        """Get subject-specific information and expertise"""
+        subject_info = {
+            "Mathematics": "I specialize in Mathematics including algebra, geometry, calculus, statistics, and problem-solving. I can help with equations, proofs, word problems, and mathematical concepts.",
+            "Science": "I excel in Science covering physics, chemistry, biology, and earth sciences. I can explain scientific concepts, experiments, formulas, and natural phenomena.",
+            "Physics": "I'm an expert in Physics including mechanics, thermodynamics, electricity, magnetism, optics, and modern physics. I can help with calculations, concepts, and problem-solving.",
+            "Chemistry": "I specialize in Chemistry including organic, inorganic, physical chemistry, chemical reactions, equations, and laboratory procedures.",
+            "Biology": "I'm knowledgeable in Biology covering cell biology, genetics, ecology, human anatomy, plant biology, and life sciences.",
+            "English": "I can help with English literature, grammar, writing, comprehension, poetry, prose, and language skills.",
+            "Hindi": "मैं हिंदी साहित्य, व्याकरण, लेखन, और भाषा कौशल में सहायता कर सकता हूं।",
+            "Social Studies": "I specialize in Social Studies including history, geography, civics, economics, and social sciences. I can help with historical events, geographical concepts, and social issues.",
+            "History": "I'm an expert in History covering world history, Indian history, ancient civilizations, and historical analysis.",
+            "Geography": "I can help with Geography including physical geography, human geography, maps, climate, and geographical concepts.",
+            "Economics": "I specialize in Economics including microeconomics, macroeconomics, economic theories, and financial concepts.",
+            "Computer Science": "I can help with Computer Science including programming, algorithms, data structures, and computer concepts.",
+            "General": "I can help with various subjects including Mathematics, Science, English, Social Studies, and more. I adapt my teaching to your specific needs and interests."
+        }
+        
+        return subject_info.get(subject, subject_info["General"])
