@@ -7,7 +7,7 @@
 
 import os
 
-DEV_MODE = True  # Change this to False for production
+DEV_MODE = False # Change this to False for production
 
 # Development Configuration (localhost)
 DEV_CONFIG = {
