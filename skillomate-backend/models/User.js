@@ -88,6 +88,52 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     }
+  },
+  // Usage tracking for free tier limits
+  usageStats: {
+    responsesToday: {
+      type: Number,
+      default: 0
+    },
+    lastResetDate: {
+      type: Date,
+      default: Date.now
+    },
+    totalResponses: {
+      type: Number,
+      default: 0
+    }
+  },
+  // Subscription information
+  subscription: {
+    plan: {
+      type: String,
+      enum: ['free', 'student', 'family'],
+      default: 'free'
+    },
+    status: {
+      type: String,
+      enum: ['active', 'inactive', 'cancelled'],
+      default: 'active'
+    },
+    startDate: Date,
+    endDate: Date,
+    subscriptionValidUntil: Date
+  },
+  // Token-based usage tracking
+  tokenUsage: {
+    tokensUsedThisMonth: {
+      type: Number,
+      default: 0
+    },
+    monthlyTokenBudget: {
+      type: Number,
+      default: 0 // 0 for free, 66000 for student, unlimited for family
+    },
+    lastTokenReset: {
+      type: Date,
+      default: Date.now
+    }
   }
 }, {
   timestamps: true
@@ -169,6 +215,139 @@ userSchema.methods.removeChatSession = function(chatId) {
 // Method to get user's chat sessions
 userSchema.methods.getChatSessions = function() {
   return this.populate('chatSessions');
+};
+
+// Method to check if user can make more requests
+userSchema.methods.canMakeRequest = function() {
+  // Free users are limited to 5 responses per day
+  if (this.subscription.plan === 'free') {
+    return this.usageStats.responsesToday < 5;
+  }
+  
+  // Check subscription validity
+  if (this.subscription.subscriptionValidUntil && new Date() > this.subscription.subscriptionValidUntil) {
+    return false;
+  }
+  
+  // For student plan, check token usage
+  if (this.subscription.plan === 'student') {
+    return this.tokenUsage.tokensUsedThisMonth < this.tokenUsage.monthlyTokenBudget;
+  }
+  
+  // Family plan has unlimited access
+  if (this.subscription.plan === 'family') {
+    return true;
+  }
+  
+  return false;
+};
+
+// Method to increment usage
+userSchema.methods.incrementUsage = async function() {
+  // Reset daily counter if it's a new day
+  const today = new Date().toDateString();
+  const lastReset = new Date(this.usageStats.lastResetDate).toDateString();
+  
+  console.log('Incrementing usage for user:', this.username, 'Before:', this.usageStats.responsesToday);
+  
+  if (today !== lastReset) {
+    console.log('New day detected, resetting counter');
+    this.usageStats.responsesToday = 0;
+    this.usageStats.lastResetDate = new Date();
+  }
+  
+  // Increment counters
+  this.usageStats.responsesToday += 1;
+  this.usageStats.totalResponses += 1;
+  
+  console.log('After increment:', this.usageStats.responsesToday);
+  
+  await this.save();
+  return this.usageStats.responsesToday;
+};
+
+// Method to get remaining free responses
+userSchema.methods.getRemainingResponses = function() {
+  if (this.subscription.plan === 'free') {
+    return Math.max(0, 5 - this.usageStats.responsesToday);
+  }
+  
+  if (this.subscription.plan === 'student') {
+    return Math.max(0, this.tokenUsage.monthlyTokenBudget - this.tokenUsage.tokensUsedThisMonth);
+  }
+  
+  if (this.subscription.plan === 'family') {
+    return 'unlimited';
+  }
+  
+  return 0;
+};
+
+// Method to check if user can consume tokens
+userSchema.methods.canConsumeTokens = function(estimatedTokens) {
+  if (this.subscription.plan === 'free') {
+    return false; // Free users don't use tokens
+  }
+  
+  if (this.subscription.plan === 'family') {
+    return true; // Family plan has unlimited tokens
+  }
+  
+  if (this.subscription.plan === 'student') {
+    return (this.tokenUsage.tokensUsedThisMonth + estimatedTokens) <= this.tokenUsage.monthlyTokenBudget;
+  }
+  
+  return false;
+};
+
+// Method to consume tokens
+userSchema.methods.consumeTokens = async function(tokens) {
+  if (this.subscription.plan === 'student') {
+    this.tokenUsage.tokensUsedThisMonth += tokens;
+    await this.save();
+    return this.tokenUsage.tokensUsedThisMonth;
+  }
+  
+  return this.tokenUsage.tokensUsedThisMonth;
+};
+
+// Method to get token usage info
+userSchema.methods.getTokenUsageInfo = function() {
+  // Safety check: ensure tokenUsage exists
+  if (!this.tokenUsage) {
+    this.tokenUsage = {
+      tokensUsedThisMonth: 0,
+      monthlyTokenBudget: 0,
+      lastTokenReset: new Date()
+    };
+  }
+  
+  const tokensUsed = this.tokenUsage.tokensUsedThisMonth || 0;
+  const tokenBudget = this.tokenUsage.monthlyTokenBudget || 0;
+  const tokensRemaining = Math.max(0, tokenBudget - tokensUsed);
+  
+  return {
+    tokensUsed: tokensUsed,
+    tokenBudget: tokenBudget,
+    tokensRemaining: tokensRemaining,
+    lastReset: this.tokenUsage.lastTokenReset || new Date(),
+    nextReset: this.getNextTokenResetDate()
+  };
+};
+
+// Method to get next token reset date
+userSchema.methods.getNextTokenResetDate = function() {
+  const now = new Date();
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return nextMonth;
+};
+
+// Method to reset monthly tokens (called by CRON job)
+userSchema.methods.resetMonthlyTokens = async function() {
+  this.tokenUsage.tokensUsedThisMonth = 0;
+  this.tokenUsage.lastTokenReset = new Date();
+  await this.save();
+  return true;
 };
 
 module.exports = mongoose.model('User', userSchema);

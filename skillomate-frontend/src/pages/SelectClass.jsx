@@ -34,7 +34,7 @@ export default function SelectClass() {
           <div className="md:m-9 p-10 bg-white sm:shadow-lg sm:rounded-2xl sm:p-10 flex flex-col items-center">
             {/* Heading */}
             <h2 className="text-2xl font-bold text-orange-500 mb-2">
-              Skillomate
+              GetSkilled Homework Helper
             </h2>
             <p className="font-bold text-center mb-8 hidden sm:block">
               Your smart AI mate for every homework challenge

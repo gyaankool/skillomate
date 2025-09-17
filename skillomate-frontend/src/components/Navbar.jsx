@@ -31,7 +31,7 @@ const Navbar = () => {
 
   return (
     <div className="px-20 py-4 flex items-center justify-between">
-      <h2 className='text-2xl text-orange-500 font-semibold'>skillomate</h2>
+      <h2 className='text-2xl text-orange-500 font-semibold'>GetSkilled Homework Helper</h2>
       
       {/* User Info */}
       {user && (

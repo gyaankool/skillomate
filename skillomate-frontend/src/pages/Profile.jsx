@@ -75,7 +75,7 @@
 //       <div className={`flex-1 ${isCollapsed ? 'md:ml-20 ml-0' : 'md:ml-64 ml-0'} transition-all flex-col duration-300`}>
 //         {/* Header */}
 //         <div className="px-8 py-4 flex items-center justify-between ">
-//           <h2 className='text-2xl text-orange-500 font-bold'>skillomate</h2>
+//           <h2 className='text-2xl text-orange-500 font-bold'>GetSkilled Homework Helper</h2>
 //           <div className="flex items-center">
 //             <img src={arrow} alt="" className="w-10 h-10" />
 //           </div>
@@ -471,7 +471,7 @@ export default function Profile() {
       >
         {/* Header */}
         <div className="px-8 py-4 flex items-center justify-between">
-          <h2 className="text-2xl text-orange-500 font-bold">skillomate</h2>
+          <h2 className="text-2xl text-orange-500 font-bold">GetSkilled Homework Helper</h2>
           <div className="flex items-center">
             <img src={arrow} alt="" className="w-10 h-10" />
           </div>

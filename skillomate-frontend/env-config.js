@@ -1,11 +1,11 @@
-// Environment Configuration for Skillomate Frontend
+// Environment Configuration for GetSkilled Homework Helper Frontend
 // =====================================================
 // TO SWITCH BETWEEN DEVELOPMENT AND PRODUCTION:
 // 1. Set DEV_MODE to true for development (localhost)
 // 2. Set DEV_MODE to false for production (hosted URLs)
 // =====================================================
 
-const DEV_MODE = false; // Change this to false for production
+const DEV_MODE = true; // Change this to false for production
 
 // Development Configuration (localhost)
 const DEV_CONFIG = {

@@ -88,12 +88,19 @@ export default function HeroPage() {
 
       {/* Navbar */}
       <nav className="relative z-10 flex justify-between items-center px-4 md:px-10 py-6 text-white">
-        <h1 className="text-orange-500 font-bold text-xl md:text-2xl">Skillomate</h1>
+        <h1 className="text-orange-500 font-bold text-xl md:text-2xl">GetSkilled Homework Helper</h1>
         <ul className="hidden md:flex gap-48 text-lg font-medium">
-          <li className="text-orange-400 cursor-pointer">Features</li>
-          <li className="text-orange-400 cursor-pointer">Support</li>
-          <li className="text-orange-400 cursor-pointer flex items-center space-x-1">
-            <span>🌐</span> <span>English</span>
+          <li 
+            className="text-orange-400 cursor-pointer hover:text-orange-300"
+            onClick={() => navigate('/features')}
+          >
+            Features
+          </li>
+          <li 
+            className="text-orange-400 cursor-pointer hover:text-orange-300"
+            onClick={() => navigate('/support')}
+          >
+            Support
           </li>
           <li 
             className="text-orange-400 cursor-pointer hover:text-orange-300"
@@ -132,12 +139,6 @@ export default function HeroPage() {
           >
             Start Solving Homework
           </button>
-          <p 
-            className="cursor-pointer hover:underline text-lg text-gray-300 font-bold"
-            onClick={handleGuestMode}
-          >
-            Try Guest Mode
-          </p>
         </div>
       </div>
 

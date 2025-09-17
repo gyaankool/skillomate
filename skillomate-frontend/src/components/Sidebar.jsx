@@ -451,7 +451,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import doubt from '../assets/images/newDoubt.png';
-import { Menu, Settings, LogOut, Plus, Trash2, MessageSquare } from 'lucide-react';
+import { Menu, Settings, LogOut, Plus, Trash2, MessageSquare, Crown } from 'lucide-react';
 import { useChat } from '../context/chatContext';
 
 const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
@@ -519,7 +519,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
           isCollapsed ? 'w-20' : 'w-64'
         } ${isSidebarVisible ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 ${className}`}
       >
-        <div className="p-6">
+        {/* Header - Fixed */}
+        <div className="p-6 flex-shrink-0">
           <div className="flex items-center justify-between relative group">
             <button
               onClick={toggleCollapse}
@@ -534,7 +535,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
           </div>
         </div>
 
-        <div className="flex-1 py-6">
+        {/* Main Content - Scrollable */}
+        <div className="flex-1 py-6 overflow-hidden flex flex-col">
           <nav className="space-y-2 px-4">
             <button
               onClick={() => handleNavigation('/dashboard')}
@@ -549,8 +551,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
 
           {!isCollapsed && (
             <div className="mt-8 px-3 flex-1 flex flex-col min-h-0">
-              <h3 className="text-lg font-semibold mb-4">Previously Asked</h3>
-              <div className="flex-1 overflow-y-auto max-h-160  space-y-2 pr-2">
+              <h3 className="text-lg font-semibold mb-4 flex-shrink-0">Previously Asked</h3>
+              <div className="flex-1 overflow-y-auto space-y-2 pr-2 min-h-0">
                 {chatSessions.length === 0 ? (
                   <p className="text-sm text-gray-200">No chats available</p>
                 ) : (
@@ -590,7 +592,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
                   ))
                 )}
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex-shrink-0">
                 <button
                   onClick={() => {
                     createNewChat();
@@ -641,7 +643,17 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, className }) => {
           )}
         </div>
 
-        <div className="border-t border-orange-400 p-4 space-y-2">
+        {/* Bottom Navigation - Fixed */}
+        <div className="border-t border-orange-400 p-4 space-y-2 flex-shrink-0">
+          <button
+            onClick={() => handleNavigation('/subscription')}
+            className={`flex items-center rounded-lg hover:bg-orange-400 transition-colors w-full text-left ${
+              isCollapsed ? 'py-2 px-3' : 'px-3 py-2'
+            } ${isActive('/subscription') ? 'bg-orange-400' : ''}`}
+          >
+            <Crown className="w-6 h-6" />
+            {!isCollapsed && <span className="text-lg pl-2">Upgrade</span>}
+          </button>
           <button
             onClick={() => handleNavigation('/profile')}
             className={`flex items-center rounded-lg hover:bg-orange-400 transition-colors w-full text-left ${

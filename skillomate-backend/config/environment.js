@@ -1,15 +1,15 @@
-// Environment Configuration for Skillomate Backend
+// Environment Configuration for GetSkilled Homework Helper Backend
 // =====================================================
 // TO SWITCH BETWEEN DEVELOPMENT AND PRODUCTION:
 // 1. Set DEV_MODE to true for development (localhost)
 // 2. Set DEV_MODE to false for production (hosted URLs)
 // =====================================================
 
-const DEV_MODE = false; // Change this to false for production
+const DEV_MODE = true; // Change this to false for production
 
 // Development Configuration (localhost)
 const DEV_CONFIG = {
-  AI_BACKEND_URL: 'http://localhost:8000',
+  AI_BACKEND_URL: 'http://127.0.0.1:8000',
   FRONTEND_URL: 'http://localhost:5173',
   CORS_ORIGINS: [
     'http://localhost:5173',
@@ -17,7 +17,7 @@ const DEV_CONFIG = {
     'http://127.0.0.1:5173',
     'http://127.0.0.1:3000'
   ],
-  DEV_MODE: false
+  DEV_MODE: true
 };
 
 // Production Configuration (hosted URLs)

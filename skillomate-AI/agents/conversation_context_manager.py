@@ -25,6 +25,66 @@ class ConversationContextManager:
         self.client = openai.OpenAI(api_key=self.openai_api_key)
         self.max_context_length = 2000  # Maximum characters for context summary
     
+    def detect_subject_from_question(self, question: str) -> str:
+        """
+        Detect the subject/topic from the current question
+        """
+        question_lower = question.lower()
+        
+        # Mathematics keywords
+        math_keywords = [
+            'solve', 'equation', 'calculate', 'math', 'algebra', 'geometry', 
+            'trigonometry', 'calculus', 'statistics', 'probability', 'fraction',
+            'decimal', 'percentage', 'ratio', 'proportion', 'graph', 'function',
+            'derivative', 'integral', 'matrix', 'vector', 'polynomial', 'quadratic',
+            'linear', 'exponential', 'logarithm', 'triangle', 'circle', 'square',
+            'rectangle', 'area', 'perimeter', 'volume', 'angle', 'degree', 'radian',
+            '=', '+', '-', '*', '/', 'x', 'y', 'z', '2x', '3x', '4x', '5x', '6x', '7x', '8x', '9x',
+            'plus', 'minus', 'times', 'divided', 'equals', 'equal to', 'sum', 'difference',
+            'product', 'quotient', 'add', 'subtract', 'multiply', 'divide'
+        ]
+        
+        # History keywords
+        history_keywords = [
+            'gandhi', 'independence', 'freedom', 'british', 'colonial', 'history',
+            'war', 'battle', 'revolution', 'empire', 'king', 'queen', 'emperor',
+            'ancient', 'medieval', 'modern', 'century', 'year', 'date', 'timeline',
+            'civilization', 'culture', 'tradition', 'heritage', 'monument', 'temple',
+            'palace', 'fort', 'museum', 'archaeology', 'artifact', 'document'
+        ]
+        
+        # Science keywords
+        science_keywords = [
+            'photosynthesis', 'cell', 'atom', 'molecule', 'element', 'compound',
+            'reaction', 'experiment', 'hypothesis', 'theory', 'law', 'principle',
+            'biology', 'chemistry', 'physics', 'laboratory', 'microscope', 'test',
+            'observation', 'data', 'analysis', 'conclusion', 'energy', 'force',
+            'motion', 'gravity', 'electricity', 'magnetism', 'light', 'sound',
+            'heat', 'temperature', 'pressure', 'density', 'mass', 'weight'
+        ]
+        
+        # English keywords
+        english_keywords = [
+            'grammar', 'essay', 'poem', 'literature', 'writing', 'reading',
+            'comprehension', 'vocabulary', 'spelling', 'pronunciation', 'sentence',
+            'paragraph', 'story', 'novel', 'character', 'plot', 'theme', 'setting',
+            'author', 'poet', 'writer', 'book', 'chapter', 'verse', 'stanza',
+            'metaphor', 'simile', 'alliteration', 'rhyme', 'prose', 'poetry'
+        ]
+        
+        # Check for subject keywords (order matters - more specific first)
+        if any(keyword in question_lower for keyword in history_keywords):
+            return 'History'
+        elif any(keyword in question_lower for keyword in science_keywords):
+            return 'Science'
+        elif any(keyword in question_lower for keyword in english_keywords):
+            return 'English'
+        elif any(keyword in question_lower for keyword in math_keywords):
+            return 'Mathematics'
+        else:
+            return 'General'
+    
+    
     def generate_conversation_summary(self, conversation_history: List[Dict], user_context: Dict) -> str:
         """
         Generate a summary of the conversation history for context
@@ -234,7 +294,37 @@ Respond in JSON format:
         """
         Get comprehensive conversation context for the AI
         """
-        # Generate conversation summary
+        # Get current subject for context
+        current_subject = self.detect_subject_from_question(current_question)
+        
+        # For new sessions (empty conversation history), return minimal context
+        if not conversation_history or len(conversation_history) == 0:
+            return {
+                "context_prompt": f"""STUDENT NAME: {user_context.get('name', 'Student')}
+STUDENT GRADE: {user_context.get('grade', 'Not specified')}
+CURRENT SUBJECT: {current_subject}
+EDUCATION BOARD: {user_context.get('board', 'CBSE')}
+
+CURRENT QUESTION: {current_question}
+
+CONVERSATION FLOW INSTRUCTIONS:
+- This is a NEW conversation - do not reference any previous topics
+- Start fresh without any assumptions about what was discussed before
+- Focus only on the current question
+- Do not mention previous subjects, topics, or any context from other sessions""",
+                "conversation_summary": "",
+                "flow_analysis": {
+                    "is_followup": False,
+                    "related_topic": None,
+                    "continuity_level": "new"
+                },
+                "is_followup": False,
+                "related_topic": None,
+                "continuity_level": "new",
+            }
+        
+        
+        # Generate conversation summary for existing sessions
         conversation_summary = self.generate_conversation_summary(conversation_history, user_context)
         
         # Analyze conversation flow
@@ -251,5 +341,5 @@ Respond in JSON format:
             "flow_analysis": flow_analysis,
             "is_followup": flow_analysis.get("is_followup", False),
             "related_topic": flow_analysis.get("related_topic"),
-            "continuity_level": flow_analysis.get("continuity_level", "new")
+            "continuity_level": flow_analysis.get("continuity_level", "new"),
         }

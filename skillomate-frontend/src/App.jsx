@@ -1,22 +1,28 @@
 import Login from './components/Login'
-
+import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import { Route, Routes } from "react-router-dom";
 import SelectClass from './pages/SelectClass';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import Features from './pages/Features';
+import Support from './pages/Support';
 import Offline from './Offline';
 import Class from './pages/Class';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import HexagonalGrid from './pages/hex';
+import Subscription from './pages/Subscription';
 
 const App = () => {
   return (
     <Routes>
       <Route path='/' element={<Home/>}/>
       <Route path='/login' element={<Login/>}/>
+      <Route path='/reset-password' element={<ResetPassword/>}/>
       <Route path='/home' element={<Home/>}/>
+      <Route path='/features' element={<Features/>}/>
+      <Route path='/support' element={<Support/>}/>
       <Route path='/signup' element={<Signup/>}/>
       <Route path='/dashboard' element={
         <ProtectedRoute>
@@ -33,6 +39,11 @@ const App = () => {
       <Route path='/class' element={
         <ProtectedRoute>
           <Class/>
+        </ProtectedRoute>
+      }/>
+      <Route path='/subscription' element={
+        <ProtectedRoute>
+          <Subscription/>
         </ProtectedRoute>
       }/>
       <Route path='/offline' element={<Offline/>}/>

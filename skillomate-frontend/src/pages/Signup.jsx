@@ -83,7 +83,7 @@ export default function Signup() {
     <div className="flex min-h-screen bg-gradient-to-b from-[#FFFFFF] to-[#F8A95F]">
       {/* Left Side - Form */}
       <div className="w-full md:w-2/5 md:pt-2 md:pb-4 flex flex-col p-6 md:p-12">
-          <h1 className="text-orange-500 font-bold text-2xl mb-10">Skillomate</h1>
+          <h1 className="text-orange-500 font-bold text-2xl mb-10">GetSkilled Homework Helper</h1>
 
         <div className="w-full max-w-xl flex-1 flex items-center">
 <div className='w-full'>

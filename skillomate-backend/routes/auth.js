@@ -270,12 +270,12 @@ router.post('/forgot-password', [
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
     // Send email
-    const subject = 'Password Reset Request - Skillomate';
+    const subject = 'Password Reset Request - GetSkilled Homework Helper';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #f97316; text-align: center;">Password Reset Request</h1>
         <p>Hello ${user.username},</p>
-        <p>You requested a password reset for your Skillomate account.</p>
+        <p>You requested a password reset for your GetSkilled Homework Helper account.</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${resetUrl}" 
              style="background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
@@ -284,7 +284,7 @@ router.post('/forgot-password', [
         </div>
         <p>If you didn't request this, please ignore this email.</p>
         <p>This link will expire in 10 minutes.</p>
-        <p>Best regards,<br>The Skillomate Team</p>
+        <p>Best regards,<br>The GetSkilled Homework Helper Team</p>
       </div>
     `;
 
@@ -446,6 +446,7 @@ router.get('/profile', protect, async (req, res) => {
         email: user.email,
         board: user.board,
         grade: user.grade,
+        profilePicture: user.profilePicture,
         isEmailVerified: user.isEmailVerified,
         role: user.role,
         lastLogin: user.lastLogin
@@ -470,7 +471,7 @@ router.put('/profile', [
   handleValidationErrors
 ], async (req, res) => {
   try {
-    const { board, grade } = req.body;
+    const { board, grade, profilePicture } = req.body;
     
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -479,6 +480,9 @@ router.put('/profile', [
 
     user.board = board;
     user.grade = grade;
+    if (profilePicture) {
+      user.profilePicture = profilePicture;
+    }
     await user.save();
 
     res.status(200).json({
@@ -490,6 +494,7 @@ router.put('/profile', [
         email: user.email,
         board: user.board,
         grade: user.grade,
+        profilePicture: user.profilePicture,
         isEmailVerified: user.isEmailVerified,
         role: user.role,
         lastLogin: user.lastLogin
@@ -548,6 +553,106 @@ console.log('user details', user);
     res.status(200).json({ success: true, message: 'Password changed successfully' });
   } catch (error) {
     console.error('Password change error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Update user subscription after successful payment
+router.put('/subscription', protect, [
+  body('plan')
+    .isIn(['free', 'student', 'family'])
+    .withMessage('Invalid subscription plan'),
+  body('status')
+    .isIn(['active', 'inactive', 'cancelled'])
+    .withMessage('Invalid subscription status'),
+  handleValidationErrors
+], async (req, res) => {
+  try {
+    const { plan, status, startDate, endDate } = req.body;
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Update subscription
+    user.subscription.plan = plan;
+    user.subscription.status = status;
+    if (startDate) user.subscription.startDate = new Date(startDate);
+    if (endDate) user.subscription.endDate = new Date(endDate);
+
+    // Set subscription validity period and token budget
+    console.log('=== SUBSCRIPTION UPDATE ===');
+    console.log('Plan:', plan, 'Status:', status);
+    console.log('Current user tokenUsage before update:', user.tokenUsage);
+    
+    if (plan === 'student') {
+      // Student plan: 1 month validity + 66,000 tokens
+      console.log('🎓 Setting up STUDENT PLAN');
+      user.subscription.subscriptionValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      
+      // Ensure tokenUsage object exists
+      if (!user.tokenUsage) {
+        user.tokenUsage = {};
+      }
+      
+      user.tokenUsage.monthlyTokenBudget = 66000; // 66,000 tokens per month
+      user.tokenUsage.tokensUsedThisMonth = 0; // Reset token usage
+      user.tokenUsage.lastTokenReset = new Date();
+      
+      console.log('✅ Student plan token fields set:', {
+        monthlyTokenBudget: user.tokenUsage.monthlyTokenBudget,
+        tokensUsedThisMonth: user.tokenUsage.tokensUsedThisMonth,
+        lastTokenReset: user.tokenUsage.lastTokenReset
+      });
+    } else if (plan === 'family') {
+      // Family plan: 1 month validity, unlimited tokens
+      console.log('👨‍👩‍👧‍👦 Setting up FAMILY PLAN');
+      user.subscription.subscriptionValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      
+      // Ensure tokenUsage object exists
+      if (!user.tokenUsage) {
+        user.tokenUsage = {};
+      }
+      
+      user.tokenUsage.monthlyTokenBudget = 999999; // Effectively unlimited
+      user.tokenUsage.tokensUsedThisMonth = 0;
+      user.tokenUsage.lastTokenReset = new Date();
+    } else if (plan === 'free') {
+      // Free plan: no token budget
+      console.log('🆓 Setting up FREE PLAN');
+      user.subscription.subscriptionValidUntil = null;
+      
+      // Ensure tokenUsage object exists
+      if (!user.tokenUsage) {
+        user.tokenUsage = {};
+      }
+      
+      user.tokenUsage.monthlyTokenBudget = 0;
+      user.tokenUsage.tokensUsedThisMonth = 0;
+    }
+
+    // Reset usage stats for premium users
+    if (plan !== 'free') {
+      user.usageStats.responsesToday = 0;
+      user.usageStats.lastResetDate = new Date();
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Subscription updated successfully',
+      subscription: user.subscription,
+      usage: {
+        responsesToday: user.usageStats.responsesToday,
+        remaining: user.getRemainingResponses(),
+        plan: user.subscription.plan,
+        tokenUsage: user.getTokenUsageInfo()
+      }
+    });
+  } catch (error) {
+    console.error('Subscription update error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

@@ -183,7 +183,7 @@ class ConversationalHomeworkTutor:
 
 STUDENT CONTEXT:
 - Name: {user_context.get('name', 'Student') if user_context else 'Student'}
-- Grade: {user_context.get('grade', 'Class 8') if user_context else 'Class 8'}
+- Grade: {user_context.get('grade', 'Not specified') if user_context else 'Not specified'}
 - Board: {user_context.get('board', 'CBSE') if user_context else 'CBSE'}
 - Subject: {selected_subject}
 - Answer Style: {answer_style}{context_info}

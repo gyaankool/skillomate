@@ -1,4 +1,4 @@
-# Environment Configuration for Skillomate AI Backend
+# Environment Configuration for GetSkilled Homework Helper AI Backend
 # =====================================================
 # TO SWITCH BETWEEN DEVELOPMENT AND PRODUCTION:
 # 1. Set DEV_MODE to True for development (localhost)
@@ -7,17 +7,19 @@
 
 import os
 
-DEV_MODE = False  # Change this to False for production
+DEV_MODE = True  # Change this to False for production
 
 # Development Configuration (localhost)
 DEV_CONFIG = {
     'CORS_ORIGINS': [
         'http://localhost:5173',
         'http://localhost:3000',
+        'http://localhost:5000',
         'http://127.0.0.1:5173',
-        'http://127.0.0.1:3000'
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:5000'
     ],
-    'BACKEND_URL': 'http://localhost:5000',
+    'BACKEND_URL': 'http://localhost:8000',
     'DEV_MODE': True
 }
 

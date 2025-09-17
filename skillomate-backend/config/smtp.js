@@ -44,12 +44,12 @@ const sendEmail = async (to, subject, html, text = '') => {
 // Email templates
 const emailTemplates = {
   welcomeEmail: (username) => ({
-    subject: process.env.EMAIL_WELCOME_SUBJECT || 'Welcome to Skillomate!',
+    subject: process.env.EMAIL_WELCOME_SUBJECT || 'Welcome to GetSkilled Homework Helper!',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #f97316; text-align: center;">Welcome to Skillomate!</h1>
+        <h1 style="color: #f97316; text-align: center;">Welcome to GetSkilled Homework Helper!</h1>
         <p>Hello ${username},</p>
-        <p>Thank you for joining Skillomate! We're excited to have you on board.</p>
+        <p>Thank you for joining GetSkilled Homework Helper! We're excited to have you on board.</p>
         <p>Where doubt finds its answer - that's our promise to you.</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${process.env.FRONTEND_URL}/dashboard" 
@@ -57,18 +57,18 @@ const emailTemplates = {
             Get Started
           </a>
         </div>
-        <p>Best regards,<br>The Skillomate Team</p>
+        <p>Best regards,<br>The GetSkilled Homework Helper Team</p>
       </div>
     `
   }),
   
   verificationEmail: (username, verificationToken) => ({
-    subject: process.env.EMAIL_VERIFICATION_SUBJECT || 'Verify Your Skillomate Account',
+    subject: process.env.EMAIL_VERIFICATION_SUBJECT || 'Verify Your GetSkilled Homework Helper Account',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #f97316; text-align: center;">Verify Your Account</h1>
         <p>Hello ${username},</p>
-        <p>Please click the button below to verify your Skillomate account:</p>
+        <p>Please click the button below to verify your GetSkilled Homework Helper account:</p>
         <div style="text-align: center; margin: 30px 0;">
           <a href="${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}" 
              style="background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
@@ -80,7 +80,7 @@ const emailTemplates = {
           ${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}
         </p>
         <p>This link will expire in 24 hours.</p>
-        <p>Best regards,<br>The Skillomate Team</p>
+        <p>Best regards,<br>The GetSkilled Homework Helper Team</p>
       </div>
     `
   })

@@ -8,7 +8,7 @@ export default function Class() {
       {/* Header */}
        <div className="w-full flex justify-start">
         <h1 className="text-[#F47B0B] text-2xl md:text-3xl font-medium">
-          Skillomate
+          GetSkilled Homework Helper
         </h1>
       </div>
       <h1 className="text-[#F47B0B] text-2xl md:text-3xl font-semibold text-center">

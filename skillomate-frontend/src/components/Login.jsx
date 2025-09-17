@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import login from '../assets/images/login.png';
 import google from '../assets/images/google.png';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, X } from 'lucide-react';
 import config from '../../env-config.js';
 
 export default function Login() {
@@ -10,18 +10,21 @@ export default function Login() {
   const API_BASE_URL = config.API_BASE_URL;
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    rememberMe: false
+    password: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [forgotPasswordMessage, setForgotPasswordMessage] = useState('');
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
@@ -71,11 +74,47 @@ export default function Login() {
     navigate('/signup');
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotPasswordLoading(true);
+    setForgotPasswordMessage('');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: forgotPasswordEmail
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setForgotPasswordMessage('Password reset email sent! Please check your inbox.');
+        setForgotPasswordEmail('');
+        setTimeout(() => {
+          setShowForgotPassword(false);
+          setForgotPasswordMessage('');
+        }, 3000);
+      } else {
+        setForgotPasswordMessage(data.message || 'Failed to send reset email. Please try again.');
+      }
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      setForgotPasswordMessage('Network error. Please try again.');
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gradient-to-b from-[#FFFFFF] to-[#F8A95F]">
       {/* Left Side - Form */}
       <div className="w-full md:w-2/5 flex flex-col p-6 md:p-12">
-          <h1 className="text-orange-500  font-bold text-lg md:text-2xl mb-12">Skillomate</h1>
+          <h1 className="text-orange-500  font-bold text-lg md:text-2xl mb-12">GetSkilled Homework Helper</h1>
        
         <div className="w-full max-w-xl flex-1 flex items-center">
           <div className='w-full'>
@@ -121,19 +160,14 @@ export default function Login() {
               </button>
             </div>
 
-            <div className="flex items-center justify-between mb-8">
-              <label className="flex items-center gap-2 font-bold">
-                <input 
-                  type="checkbox" 
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                /> 
-                Remember Me
-              </label>
-              <a href="#" className="text-orange-500 font-medium">
+            <div className="flex items-center justify-end mb-8">
+              <button 
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-orange-500 font-medium hover:text-orange-600"
+              >
                 Forgot Password?
-              </a>
+              </button>
             </div>
 
             <button 
@@ -195,6 +229,78 @@ export default function Login() {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Reset Password</h3>
+              <button
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setForgotPasswordMessage('');
+                  setForgotPasswordEmail('');
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            {forgotPasswordMessage && (
+              <div className={`mb-4 p-3 rounded ${
+                forgotPasswordMessage.includes('sent') 
+                  ? 'bg-green-100 border border-green-400 text-green-700' 
+                  : 'bg-red-100 border border-red-400 text-red-700'
+              }`}>
+                {forgotPasswordMessage}
+              </div>
+            )}
+
+            <form onSubmit={handleForgotPassword}>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2 font-bold">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={forgotPasswordEmail}
+                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className="w-full p-3 border rounded"
+                  required
+                />
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setForgotPasswordMessage('');
+                    setForgotPasswordEmail('');
+                  }}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={forgotPasswordLoading}
+                  className={`px-4 py-2 rounded text-white font-bold ${
+                    forgotPasswordLoading 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-orange-500 hover:bg-orange-600'
+                  }`}
+                >
+                  {forgotPasswordLoading ? 'Sending...' : 'Send Reset Email'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

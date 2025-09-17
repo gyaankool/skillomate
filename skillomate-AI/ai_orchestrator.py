@@ -21,7 +21,7 @@ from agents.conversation_context_manager import ConversationContextManager
 
 logger = logging.getLogger(__name__)
 
-class SkillomateAIOrchestrator:
+class GetSkilledHomeworkHelperOrchestrator:
     """
     Main AI Orchestrator that coordinates all agents for comprehensive homework assistance
     """
@@ -99,6 +99,7 @@ class SkillomateAIOrchestrator:
         logger.info(f"Created session {session_id} with user context: {default_context}")
         return session_id
     
+    
     def _get_or_create_session(self, session_id: Optional[str] = None, user_id: Optional[str] = None) -> str:
         """Get existing session or create new one"""
         if session_id and session_id in self.conversation_sessions:
@@ -138,17 +139,18 @@ class SkillomateAIOrchestrator:
         """Extract user information from messages"""
         user_info = {}
         
-        # Extract name
+        # Extract name - Fixed patterns to be more specific and avoid conflicts
         name_patterns = [
-            r"i am (\w+)",
-            r"my name is (\w+)",
+            r"my name is (\w+)",  # Most specific first
             r"i'm (\w+)",
             r"call me (\w+)",
+            r"^i am (\w+)$",  # Only match if "i am" is at start and end
+            r"^i am (\w+)\s",  # Only match if "i am" is at start followed by space
             r"i am abhinaya",
             r"i'm abhinaya"
         ]
         
-        message_lower = message.lower()
+        message_lower = message.lower().strip()
         for pattern in name_patterns:
             import re
             match = re.search(pattern, message_lower)
@@ -156,10 +158,10 @@ class SkillomateAIOrchestrator:
                 user_info["name"] = match.group(1).title()
                 break
         
-        # Extract grade/class
+        # Extract grade/class - Fixed to handle "grade 8" format properly
         grade_patterns = [
-            r"class (\d+)",
-            r"grade (\d+)",
+            r"grade (\d+)",  # Most specific first - "grade 8"
+            r"class (\d+)",  # "class 8"
             r"(\d+)(?:st|nd|rd|th) class",
             r"(\d+)(?:st|nd|rd|th) grade"
         ]
@@ -167,7 +169,8 @@ class SkillomateAIOrchestrator:
         for pattern in grade_patterns:
             match = re.search(pattern, message_lower)
             if match:
-                user_info["grade"] = int(match.group(1))
+                grade_num = int(match.group(1))
+                user_info["grade"] = f"Class {grade_num}"  # Store as "Class 8" format
                 break
         
         return user_info
@@ -232,6 +235,22 @@ class SkillomateAIOrchestrator:
         # Keep only the last max_history_length messages
         if len(session["conversation_history"]) > self.max_history_length:
             session["conversation_history"] = session["conversation_history"][-self.max_history_length:]
+    
+    def _store_conversation(self, session_id: str, user_message: str, ai_response: str):
+        """Store a complete conversation exchange"""
+        if session_id not in self.conversation_sessions:
+            logger.warning(f"Session {session_id} not found for storing conversation")
+            return
+        
+        # Add user message
+        self._add_to_conversation_history(session_id, "user", user_message)
+        # Add AI response
+        self._add_to_conversation_history(session_id, "assistant", ai_response)
+        
+        # Update last activity
+        self.conversation_sessions[session_id]["last_activity"] = datetime.now()
+        
+        logger.info(f"Stored conversation for session {session_id}: {len(self.conversation_sessions[session_id]['conversation_history'])} messages")
     
     def _is_greeting(self, question: str) -> bool:
         """
@@ -316,10 +335,10 @@ class SkillomateAIOrchestrator:
             ]
         else:
             greetings = [
-                "Hi there! 👋 I'm Skillomate, your AI homework helper. What's your name?",
+                "Hi there! 👋 I'm GetSkilled Homework Helper, your AI homework assistant. What's your name?",
                 "Hello! 😊 I'm here to help with your studies. What should I call you?",
                 "Hey! 🎓 I'm your friendly AI tutor. What's your name?",
-                "Namaste! 🙏 Welcome to Skillomate. What's your name?",
+                "Namaste! 🙏 Welcome to GetSkilled Homework Helper. What's your name?",
                 "Hi! 📚 I'm here to help with your homework. What should I call you?"
             ]
         
@@ -373,6 +392,7 @@ class SkillomateAIOrchestrator:
                 question, conversation_history, user_context_from_session
             )
             
+            
             # Generate conversational response with enhanced context
             logger.info(f"Processing question: '{question}'")
             logger.info(f"User context: {user_context_from_session}")
@@ -420,7 +440,7 @@ class SkillomateAIOrchestrator:
                     enhanced_response,
                     user_context_from_session.get("subject", "Mathematics"),
                     user_context_from_session.get("topic", "general"),
-                    user_context_from_session.get("grade", "Class 8"),
+                    user_context_from_session.get("grade", None),
                     user_context_from_session.get("board", "CBSE")
                 )
             except Exception as e:
@@ -429,12 +449,15 @@ class SkillomateAIOrchestrator:
             # Add bot response to conversation history
             self._add_to_conversation_history(session_id, "assistant", enhanced_response)
             
+            # Use enhanced response as final response
+            final_response = enhanced_response
+            
             # Return conversational response
             return {
                 "success": True,
                 "source": "conversational_tutor",
-                "answer": enhanced_response,
-                "response": enhanced_response,  # Compatibility field
+                "answer": final_response,
+                "response": final_response,  # Compatibility field
                 "context": user_context_from_session or {},
                 "session_id": session_id,
                 "interactive": response_result.get("interactive", False),
@@ -700,7 +723,7 @@ class SkillomateAIOrchestrator:
         """Generate AI response using OpenAI with conversation context"""
         try:
             # Create a comprehensive system prompt
-            system_prompt = """You are Skillomate, an intelligent educational AI assistant designed to help students with their academic doubts and questions. 
+            system_prompt = """You are GetSkilled Homework Helper, an intelligent educational AI assistant designed to help students with their academic doubts and questions. 
 
 Key characteristics:
 - Provide clear, step-by-step explanations
@@ -712,12 +735,25 @@ Key characteristics:
 - Remember the student's name and use it when appropriate
 - Maintain conversation continuity and context
 
-IMPORTANT CONTEXT RULES:
-1. ALWAYS use the conversation context provided to you
-2. If the student asks "who am i?" or similar identity questions, use the context to tell them what you know about them from the conversation
-3. If you know the student's name from context, use it in your responses
-4. If the student has shared information about themselves, reference that information
-5. Be personal and conversational, not generic
+CRITICAL CONTEXT USAGE RULES:
+1. ALWAYS check the conversation context FIRST before responding
+2. If the student asks "what is my name?" or "who am i?" - ALWAYS use the STUDENT NAME from context
+3. If the student asks "what grade am I in?" - ALWAYS use the STUDENT GRADE from context
+4. If you have the student's name in context, use it in your responses
+5. If the student has shared information about themselves, reference that information
+6. NEVER ask for information that's already in the context
+7. Be personal and conversational, not generic
+
+NEW SESSION RULES:
+- If the context says "This is a NEW conversation" - DO NOT reference any previous topics
+- Start completely fresh without mentioning photosynthesis, previous studies, or any topics from other sessions
+- Focus only on the current question and current session context
+- Do not assume the student was studying anything before this conversation
+
+CONTEXT RESPONSE EXAMPLES:
+- If context shows "STUDENT NAME: Kapil" and student asks "what is my name?" → "Your name is Kapil!"
+- If context shows "STUDENT GRADE: Class 8" and student asks "what grade am I in?" → "You are in Class 8!"
+- If context shows both name and grade, use both in responses
 
 Always maintain a helpful, encouraging tone and focus on educational value.
 
@@ -737,14 +773,20 @@ IMPORTANT FORMATTING RULES:
                     "content": f"Conversation Context:\n{conversation_context}"
                 })
             
+            # DEBUG: Log the exact messages being sent to OpenAI
+            logger.info(f"Messages being sent to OpenAI:")
+            for i, msg in enumerate(messages):
+                logger.info(f"Message {i}: Role={msg['role']}, Content={msg['content'][:200]}...")
+            
             # Add the current question
             messages.append({"role": "user", "content": question})
             
             response = self.client.chat.completions.create(
                 model=self.default_model,
                 messages=messages,
-                max_tokens=1500,
-                temperature=0.7
+                max_tokens=1000,  # Reduced to prevent timeout
+                temperature=0.7,
+                timeout=30  # 30 second timeout
             )
             
             ai_response = response.choices[0].message.content.strip()

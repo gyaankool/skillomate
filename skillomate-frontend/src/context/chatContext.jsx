@@ -246,6 +246,10 @@ export const ChatProvider = ({ children }) => {
           setChatSessions([newChat, ...chatSessions]);
           setCurrentChatId(newChat._id);
           setChatHistory([]);
+          // Clear any stored AI session ID to ensure fresh context
+          localStorage.removeItem('aiSessionId');
+          // Dispatch custom event to notify Dashboard to clear AI session
+          window.dispatchEvent(new CustomEvent('newChatCreated', { detail: { chatId: newChat._id } }));
           navigate('/dashboard');
           return newChat._id; // Return the chat ID
         } else {

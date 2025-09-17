@@ -3,6 +3,8 @@ from flask_cors import CORS
 import openai
 import os
 import json
+import speech_recognition as sr
+import tempfile
 
 
 
@@ -16,7 +18,7 @@ load_dotenv()
 
 # Import configuration and the new AI orchestrator
 from config import *
-from ai_orchestrator import SkillomateAIOrchestrator
+from ai_orchestrator import GetSkilledHomeworkHelperOrchestrator
 from environment_config.environment import config as env_config
 
 # Import new enhancement features
@@ -38,7 +40,7 @@ CORS(app, origins=env_config['CORS_ORIGINS'],
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Initialize the AI orchestrator
-ai_orchestrator = SkillomateAIOrchestrator()
+ai_orchestrator = GetSkilledHomeworkHelperOrchestrator()
 
 # Initialize enhancement features
 response_formatter = TeacherApprovedFormatter()
@@ -47,12 +49,12 @@ board_templates = BoardSpecificTemplates()
 diagram_generator = EducationalDiagramGenerator()
 offline_question_bank = OfflineQuestionBank()
 
-class SkillomateAI:
+class GetSkilledHomeworkHelperAI:
     def __init__(self):
         self.conversation_history = []
         # Initialize OpenAI client
         self.client = openai.OpenAI(api_key=openai.api_key)
-        self.system_prompt = """You are Skillomate, an intelligent educational AI assistant designed to help students with their academic doubts and questions. 
+        self.system_prompt = """You are GetSkilled Homework Helper, an intelligent educational AI assistant designed to help students with their academic doubts and questions. 
 
 Key characteristics:
 - Provide clear, step-by-step explanations
@@ -118,7 +120,7 @@ Always maintain a helpful, encouraging tone and focus on educational value."""
 def index():
     """Main page"""
     return jsonify({
-        "message": "Skillomate AI Homework Solver",
+        "message": "GetSkilled Homework Helper",
         "status": "running",
         "version": "2.0",
         "features": [
@@ -134,13 +136,18 @@ def index():
             "guided_learning": "/api/guided-learning",
             "diagram": "/api/diagram",
             "chat": "/api/chat",
+            "chat_enhanced": "/api/chat-enhanced",
+            "chat_ai_session": "/api/chat/ai-session",
+            "new_chat": "/api/chat/new",
             "cache_stats": "/api/cache/stats",
             "search_cache": "/api/cache/search",
             "health": "/api/health",
             "session_create": "/api/session/create",
             "session_info": "/api/session/<session_id>",
             "session_delete": "/api/session/<session_id>",
-            "list_sessions": "/api/sessions"
+            "list_sessions": "/api/sessions",
+            "voice_input": "/api/voice-input",
+            "voice_output": "/api/voice-output"
         }
     })
 
@@ -352,11 +359,28 @@ def chat():
         user_message = data.get('message', '')
         context = data.get('context', {})
         session_id = data.get('session_id', None)
+        create_new_session = data.get('new_chat', False)  # Flag to create new session
         
         if not user_message:
             return jsonify({'success': False, 'error': 'Message is required'}), 400
         
-        # Use the new AI orchestrator with session management
+        # Handle new chat vs continue chat logic
+        if create_new_session:
+            # Create a completely new session
+            session_id = ai_orchestrator._create_session(
+                user_id=context.get('user_id'),
+                user_context=context
+            )
+            logger.info(f"Created new chat session: {session_id}")
+        elif not session_id:
+            # No session provided and not creating new - create one
+            session_id = ai_orchestrator._create_session(
+                user_id=context.get('user_id'),
+                user_context=context
+            )
+            logger.info(f"Created new session (no session_id provided): {session_id}")
+        
+        # Use the AI orchestrator with proper session management
         result = ai_orchestrator.process_homework_request(
             user_message, 
             context, 
@@ -364,14 +388,19 @@ def chat():
             session_id
         )
         
+        # Ensure we return the correct session_id
+        final_session_id = result.get('session_id', session_id)
+        
         return jsonify({
             'success': True,
             'response': result.get('answer', result.get('response', '')),
             'answer': result.get('answer', result.get('response', '')),  # Include both for compatibility
             'timestamp': datetime.now().isoformat(),
-            'timestamp': datetime.now().isoformat(),
             'source': result.get('source', 'ai_generated'),
-            'session_id': result.get('session_id', session_id)
+            'session_id': final_session_id,
+            'is_new_session': create_new_session,
+            'conversation_context': result.get('conversation_summary', ''),
+            'is_followup': result.get('is_followup', False),
         })
         
     except Exception as e:
@@ -384,13 +413,30 @@ def enhanced_chat():
     try:
         data = request.get_json()
         message = data.get('message', '')
-        session_id = data.get('session_id', str(uuid.uuid4()))
+        session_id = data.get('session_id', None)
         user_context = data.get('context', {})
         format_style = data.get('format_style', 'teacher_approved')
         answer_type = data.get('answer_type', 'general')
+        create_new_session = data.get('new_chat', False)  # Flag to create new session
         
         if not message:
             return jsonify({'success': False, 'error': 'Message is required'}), 400
+        
+        # Handle new chat vs continue chat logic
+        if create_new_session:
+            # Create a completely new session
+            session_id = ai_orchestrator._create_session(
+                user_id=user_context.get('user_id'),
+                user_context=user_context
+            )
+            logger.info(f"Created new enhanced chat session: {session_id}")
+        elif not session_id:
+            # No session provided and not creating new - create one
+            session_id = ai_orchestrator._create_session(
+                user_id=user_context.get('user_id'),
+                user_context=user_context
+            )
+            logger.info(f"Created new enhanced session (no session_id provided): {session_id}")
         
         # Get conversation history for this session
         conversation_history = ai_orchestrator._get_conversation_context(session_id)
@@ -401,7 +447,7 @@ def enhanced_chat():
         
         # Extract context information
         subject = user_context.get('subject', 'Mathematics')
-        grade = user_context.get('grade', 'Class 8')
+        grade = user_context.get('grade', None)  # No default grade
         board = user_context.get('board', 'CBSE')
         topic = user_context.get('topic', 'general')
         
@@ -447,7 +493,9 @@ def enhanced_chat():
             'estimated_marks': formatted_result.get('estimated_marks', 0),
             'timestamp': datetime.now().isoformat(),
             'source': 'enhanced_ai_generated',
-            'session_id': session_id
+            'session_id': session_id,
+            'is_new_session': create_new_session,
+            'conversation_context': 'Enhanced formatting and context applied'
         })
         
     except Exception as e:
@@ -470,7 +518,8 @@ def create_session():
         return jsonify({
             'success': True,
             'session_id': session_id,
-            'message': 'Session created successfully with user context'
+            'message': 'Session created successfully with user context',
+            'is_new_session': True
         })
         
     except Exception as e:
@@ -479,6 +528,95 @@ def create_session():
             "success": False,
             "error": "Failed to create session"
         }), 500
+
+@app.route('/api/chat/ai-session', methods=['POST'])
+def create_ai_session():
+    """Create AI session - endpoint expected by frontend"""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id', None)
+        user_context = data.get('context', {})
+        chat_id = data.get('chat_id', None)  # Frontend chat ID
+        
+        logger.info(f"Creating AI session for user: {user_id}, chat: {chat_id}")
+        
+        # Validate OpenAI API key
+        if not openai.api_key:
+            logger.error("OpenAI API key not configured")
+            return jsonify({
+                "success": False,
+                "error": "AI service not configured properly"
+            }), 500
+        
+        # Create a new AI session
+        session_id = ai_orchestrator._create_session(user_id, user_context)
+        
+        logger.info(f"AI session created successfully: {session_id}")
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'chat_id': chat_id,
+            'message': 'AI session created successfully',
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating AI session: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": f"Failed to create AI session: {str(e)}"
+        }), 500
+
+@app.route('/api/chat/new', methods=['POST'])
+def start_new_chat():
+    """Start a completely new chat session - clears all previous context"""
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id', None)
+        user_context = data.get('context', {})
+        initial_message = data.get('message', '')
+        
+        # Create a completely new session with fresh context
+        session_id = ai_orchestrator._create_session(user_id, user_context)
+        
+        # Mark this session as a new chat to prevent context bleeding
+        if session_id in ai_orchestrator.conversation_sessions:
+            ai_orchestrator.conversation_sessions[session_id]['is_new_chat'] = True
+        
+        # If there's an initial message, process it
+        if initial_message:
+            result = ai_orchestrator.process_homework_request(
+                initial_message, 
+                user_context, 
+                "comprehensive",
+                session_id
+            )
+            
+            return jsonify({
+                'success': True,
+                'session_id': session_id,
+                'message': 'New chat session created and initial message processed',
+                'is_new_session': True,
+                'response': result.get('answer', result.get('response', '')),
+                'timestamp': datetime.now().isoformat()
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'session_id': session_id,
+                'message': 'New chat session created successfully',
+                'is_new_session': True,
+                'timestamp': datetime.now().isoformat()
+            })
+        
+    except Exception as e:
+        logger.error(f"Error starting new chat: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Failed to start new chat"
+        }), 500
+
 
 @app.route('/api/session/<session_id>', methods=['GET'])
 def get_session_info(session_id):
@@ -618,7 +756,7 @@ def generate_question_bank():
     """Generate question bank for offline use"""
     try:
         data = request.get_json()
-        grade = data.get('grade', 'Class 8')
+        grade = data.get('grade', None)  # No default grade
         subject = data.get('subject', 'Mathematics')
         board = data.get('board', 'CBSE')
         
@@ -737,6 +875,148 @@ def get_offline_analytics():
         return jsonify({
             'success': False,
             'error': 'Failed to get analytics'
+        }), 500
+
+# Voice Input Endpoint
+@app.route('/api/voice-input', methods=['POST'])
+def voice_input():
+    """Process voice input and convert to text, then get AI response"""
+    try:
+        # Get the uploaded audio file
+        if 'audio' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'No audio file provided'
+            }), 400
+        
+        audio_file = request.files['audio']
+        if audio_file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'No audio file selected'
+            }), 400
+        
+        # Get other form data
+        context = request.form.get('context', '{}')
+        session_id = request.form.get('session_id', None)
+        new_chat = request.form.get('new_chat', 'false').lower() == 'true'
+        
+        try:
+            context = json.loads(context) if context else {}
+        except json.JSONDecodeError:
+            context = {}
+        
+        # Save the audio file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio:
+            audio_file.save(temp_audio.name)
+            
+            # Initialize speech recognition
+            r = sr.Recognizer()
+            
+            # Convert audio to text
+            with sr.AudioFile(temp_audio.name) as source:
+                audio_data = r.record(source)
+                
+            try:
+                # Use Google Speech Recognition (free)
+                text = r.recognize_google(audio_data)
+                logger.info(f"Voice recognition successful: {text}")
+                
+                # Process the recognized text with AI
+                if new_chat:
+                    # Create new session for voice input
+                    session_id = ai_orchestrator._create_session(
+                        user_id=context.get('user_id'),
+                        user_context=context
+                    )
+                    logger.info(f"Created new session for voice input: {session_id}")
+                elif not session_id:
+                    # Create session if none provided
+                    session_id = ai_orchestrator._create_session(
+                        user_id=context.get('user_id'),
+                        user_context=context
+                    )
+                    logger.info(f"Created session for voice input (no session_id): {session_id}")
+                
+                # Get AI response for the recognized text
+                ai_result = ai_orchestrator.process_homework_request(
+                    text, 
+                    context, 
+                    "comprehensive",
+                    session_id
+                )
+                
+                # Clean up temp file
+                os.unlink(temp_audio.name)
+                
+                if ai_result.get('success'):
+                    return jsonify({
+                        'success': True,
+                        'text': text,
+                        'ai_response': {
+                            'response': ai_result.get('answer', ai_result.get('response', '')),
+                            'session_id': session_id
+                        },
+                        'session_id': session_id,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                else:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Failed to get AI response',
+                        'text': text
+                    })
+                
+            except sr.UnknownValueError:
+                # Clean up temp file
+                os.unlink(temp_audio.name)
+                return jsonify({
+                    'success': False,
+                    'error': 'Could not understand audio'
+                })
+            except sr.RequestError as e:
+                # Clean up temp file
+                os.unlink(temp_audio.name)
+                return jsonify({
+                    'success': False,
+                    'error': f'Speech recognition service error: {str(e)}'
+                })
+                
+    except Exception as e:
+        logger.error(f"Voice input error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to process voice input',
+            'details': str(e)
+        }), 500
+
+# Voice Output Endpoint (Text to Speech)
+@app.route('/api/voice-output', methods=['POST'])
+def voice_output():
+    """Convert text to speech"""
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        
+        if not text:
+            return jsonify({
+                'success': False,
+                'error': 'Text is required'
+            }), 400
+        
+        # For now, return success without actual TTS implementation
+        # This can be implemented later with libraries like gTTS or Azure Speech
+        return jsonify({
+            'success': True,
+            'message': 'Text-to-speech endpoint available but not implemented',
+            'text': text
+        })
+        
+    except Exception as e:
+        logger.error(f"Voice output error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to generate speech'
         }), 500
 
 # Diagram Generation Endpoints
